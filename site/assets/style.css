@@ -491,3 +491,13 @@ code{overflow-wrap:anywhere}
   .tracking-activity li{padding-left:1.03rem}
   .tracking-event{padding:.58rem .65rem}
 }
+.home-pathways-title{grid-column:1/-1;font-size:clamp(1.65rem,3.6vw,2.5rem);margin:.55rem 0 .25rem}
+.home-pathways .pathway{padding:0;overflow:hidden;border:1px solid var(--line)}
+.pathway>img{display:block;width:100%;aspect-ratio:3/2;height:auto;object-fit:cover;background:#e6eff2}
+.pathway-content{display:flex;flex:1;flex-direction:column;padding:1.12rem 1.18rem 1.2rem}
+.pathway-content h3{font-size:clamp(1.22rem,2.6vw,1.5rem)}
+@media(max-width:620px){
+  .home-pathways .pathway{display:grid;grid-template-columns:minmax(0,1fr)}
+  .pathway>img{max-height:190px;object-position:center}
+  .pathway-content{padding:.82rem .92rem .9rem}
+}
