@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Track your PrimeFreight Express shipment and view its latest delivery updates.">
+  <meta name="description" content="Track your GlobeFreight Express shipment and view its latest delivery updates.">
   <meta name="referrer" content="no-referrer">
-  <title>PrimeFreight Express | Shipment Tracking</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GlobeFreight Express">
+  <meta property="og:title" content="GlobeFreight Express | Shipment Tracking">
+  <meta property="og:description" content="Enter your tracking number for shipment status and delivery updates.">
+  <meta property="og:url" content="__GLOBEFREIGHT_SITE_URL__/">
+  <meta property="og:image" content="__GLOBEFREIGHT_SITE_URL__/assets/link-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="GlobeFreight Express shipment tracking">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="assets/globe-mark.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <title>GlobeFreight Express | Shipment Tracking</title>
   <link rel="stylesheet" href="assets/style.css">
   <script defer src="assets/app.js"></script>
 </head>
 <body>
 <header class="header">
   <div class="shell header-inner">
-    <a class="brand" href="#" aria-label="PrimeFreight Express home"><span class="brand-mark" aria-hidden="true">◈</span><span>PrimeFreight <small>EXPRESS</small></span></a>
+    <a class="brand" href="#" aria-label="GlobeFreight Express home"><span class="brand-mark" aria-hidden="true">â—ˆ</span><span>GlobeFreight <small>EXPRESS</small></span></a>
     <nav aria-label="Main navigation">
       <a href="#tracking">Track a shipment</a>
       <a class="portal-link" href="#portal">Team portal</a>
@@ -24,13 +36,13 @@
     <section class="hero">
       <div class="shell hero-inner">
         <p class="eyebrow"><span></span> FREIGHT &amp; LOGISTICS</p>
-        <h1>Freight in motion.<br><em>Clarity at every step.</em></h1>
-        <p>Follow your shipment from dispatch to delivery with PrimeFreight Express.</p>
+        <h1>Know where<br><em>your freight stands.</em></h1>
+        <p>Check your latest shipment status, estimated delivery, and milestone history in one place.</p>
       </div>
     </section>
     <section class="shell tracking-area" id="tracking" aria-labelledby="tracking-title">
       <div class="card tracking-card">
-        <div class="tracking-heading"><span class="icon-box" aria-hidden="true">⌖</span><div>
+        <div class="tracking-heading"><span class="icon-box" aria-hidden="true">âŒ–</span><div>
           <h2 id="tracking-title">Track your shipment</h2>
           <p>Enter the tracking number from your shipment confirmation.</p>
         </div></div>
@@ -46,14 +58,20 @@
       </div>
       <section class="card results" id="tracking-result" aria-label="Shipment results" aria-live="polite" hidden></section>
       <div class="milestones" aria-label="Shipment milestones">
-        <article><span class="milestone-icon" aria-hidden="true">◇</span><div><h3>Dispatch</h3><p>See when your freight is picked up.</p></div></article>
-        <article><span class="milestone-icon" aria-hidden="true">⇄</span><div><h3>In transit</h3><p>Follow recorded movement and exceptions.</p></div></article>
-        <article><span class="milestone-icon" aria-hidden="true">✓</span><div><h3>Delivery</h3><p>Check the latest delivery milestone.</p></div></article>
+        <article><span class="milestone-icon" aria-hidden="true">â—‡</span><div><h3>Dispatch</h3><p>See when your freight is picked up.</p></div></article>
+        <article><span class="milestone-icon" aria-hidden="true">â‡„</span><div><h3>In transit</h3><p>Follow recorded movement and exceptions.</p></div></article>
+        <article><span class="milestone-icon" aria-hidden="true">âœ“</span><div><h3>Delivery</h3><p>Check the latest delivery milestone.</p></div></article>
       </div>
     </section>
   </div>
   <section id="portal-page" class="shell portal" aria-labelledby="portal-title" hidden>
-    <div class="portal-heading"><div><p class="eyebrow"><span></span> PRIMEFREIGHT EXPRESS</p><h1 id="portal-title">Team portal</h1></div><button type="button" class="secondary" id="logout" hidden>Sign out</button></div>
+    <div class="portal-heading">
+      <div><p class="eyebrow"><span></span> GLOBEFREIGHT EXPRESS</p><h1 id="portal-title">Team portal</h1><p id="identity" class="portal-identity" hidden></p></div>
+      <div class="portal-actions">
+        <button id="new-shipment" type="button" hidden>New shipment</button>
+        <button type="button" class="secondary" id="logout" hidden>Sign out</button>
+      </div>
+    </div>
     <p id="portal-message" role="status" hidden></p>
     <div id="signin-card" class="card signin">
       <h2 id="signin-title">Staff sign-in</h2>
@@ -68,6 +86,11 @@
       </form>
     </div>
     <div id="workspace" hidden>
+      <section class="dashboard-metrics" aria-label="Shipment overview">
+        <article class="card metric"><span class="metric-icon" aria-hidden="true">□</span><div><h2 id="metric-shipments-label">Shipments</h2><strong id="metric-shipments">—</strong></div></article>
+        <article class="card metric"><span class="metric-icon" aria-hidden="true">≋</span><div><h2>Tracking updates today</h2><strong id="metric-updates">—</strong></div></article>
+        <article class="card metric"><span class="metric-icon" aria-hidden="true">✓</span><div><h2>Deliveries recorded today</h2><strong id="metric-deliveries">—</strong></div></article>
+      </section>
       <details class="card staff-create" id="staff-create" hidden>
         <summary>Create staff login</summary>
         <p class="muted">Create a login here, then assign the account to shipments under Staff access.</p>
@@ -82,10 +105,15 @@
       </details>
       <div class="workspace-grid">
         <aside class="card list-card">
-          <h2>Shipments</h2>
-          <p id="identity" class="muted"></p>
-          <button id="new-shipment" type="button" hidden>New shipment</button>
-          <button id="refresh-workspace" class="secondary" type="button">Refresh list</button>
+          <div class="list-heading">
+            <h2>Shipments</h2>
+            <button id="refresh-workspace" class="secondary" type="button">Refresh</button>
+          </div>
+          <form class="shipment-search" id="shipment-search">
+            <label for="shipment-query">Find by tracking number</label>
+            <div class="input-row"><input id="shipment-query" name="query" maxlength="50" placeholder="Tracking number" autocomplete="off">
+            <button type="submit" class="secondary">Find</button></div>
+          </form>
           <div id="shipment-list" aria-label="Available shipments"></div>
           <button id="next-page" class="secondary" type="button" hidden>Load more</button>
         </aside>
@@ -94,7 +122,7 @@
     </div>
   </section>
 </main>
-<footer><div class="shell footer-inner"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">◈</span><span>PrimeFreight <small>EXPRESS</small></span></a><span>Shipment tracking &amp; logistics</span></div></footer>
+<footer><div class="shell footer-inner"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">â—ˆ</span><span>GlobeFreight <small>EXPRESS</small></span></a><span>Shipment tracking &amp; logistics</span></div></footer>
 </body>
 </html>
 

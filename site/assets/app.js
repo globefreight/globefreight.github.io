@@ -12,6 +12,8 @@ let loginMode = 'staff';
 let currentShipment = null;
 let detailVersion = 0;
 let listVersion = 0;
+let metricsVersion = 0;
+let shipmentQuery = '';
 let pageOffset = 0;
 let trackingVersion = 0;
 let trackTimer;
@@ -36,9 +38,14 @@ async function request(path, { method = 'GET', body, token, prefer } = {}) {
       throw new Error('Deploy the create-staff Edge Function in Supabase to enable account creation.');
     }
     if (data?.code === 'PGRST202' || data?.code === 'PGRST205') {
-      throw new Error('The PrimeFreight database setup is incomplete.');
+      throw new Error('The GlobeFreight database setup is incomplete.');
     }
     throw new Error(data?.message || data?.msg || data?.error_description || 'Request failed. Please try again.');
+  }
+  if (method === 'HEAD') {
+    const count = response.headers.get('Content-Range')?.split('/').at(-1);
+    if (!/^\d+$/.test(count || '')) throw new Error('The shipment count is unavailable.');
+    return Number(count);
   }
   return data;
 }
@@ -68,6 +75,12 @@ function button(text, action, className = 'secondary') {
   node.type = 'button';
   node.addEventListener('click', () => run(node, action));
   return node;
+}
+
+function statusBadge(status) {
+  const badge = el('span', status || 'Awaiting update', 'badge');
+  if (status) badge.dataset.status = status;
+  return badge;
 }
 
 function message(target, text = '', error = false) {
@@ -121,8 +134,8 @@ const sample = {
 function showTracking(data) {
   const result = $('tracking-result');
   const header = el('div', undefined, 'result-header');
-  header.append(el('h2', data.tracking_code), el('span', data.events[0]?.status || 'Awaiting update', 'badge'));
-  result.replaceChildren(header, el('p', data.origin + ' to ' + data.destination + ' · ' + data.service, 'muted'));
+  header.append(el('h2', data.tracking_code), statusBadge(data.events[0]?.status));
+  result.replaceChildren(header, el('p', data.origin + ' to ' + data.destination + ' Â· ' + data.service, 'muted'));
   if (data === sample) result.append(el('p', 'Sample shipment with illustrative tracking updates.', 'muted'));
   if (data.eta) result.append(el('p', 'Estimated delivery ' + dateOnly.format(new Date(data.eta))));
   result.append(el('h3', 'Tracking history'), timeline(data.events));
@@ -185,9 +198,16 @@ function clearSession() {
   currentShipment = null;
   detailVersion++;
   listVersion++;
+  metricsVersion++;
+  shipmentQuery = '';
+  $('shipment-search').reset();
+  for (const id of ['metric-shipments', 'metric-updates', 'metric-deliveries']) $(id).textContent = '—';
   $('shipment-list').replaceChildren();
   $('shipment-detail').replaceChildren();
   $('identity').textContent = '';
+  $('identity').hidden = true;
+  $('portal-title').textContent = 'Team portal';
+  $('new-shipment').hidden = true;
   $('staff-create').hidden = true;
   $('staff-create').open = false;
   $('create-staff-form').reset();
@@ -211,14 +231,17 @@ bind($('signin-form'), async (values) => {
   session = { ...auth, expiresAt: Date.now() + (auth.expires_in - 10) * 1000 };
   isAdmin = rights.admin;
   $('signin-form').reset();
-  $('identity').textContent = (isAdmin ? 'Administrator' : 'Staff') + ' · ' + auth.user.email;
+  $('identity').textContent = (isAdmin ? 'Administrator' : 'Staff') + ' Â· ' + auth.user.email;
+  $('identity').hidden = false;
+  $('portal-title').textContent = isAdmin ? 'Operations dashboard' : 'Shipment dashboard';
+  $('metric-shipments-label').textContent = isAdmin ? 'Total shipments' : 'Assigned shipments';
   $('signin-card').hidden = true;
   $('workspace').hidden = false;
   $('logout').hidden = false;
   $('new-shipment').hidden = !isAdmin;
   $('staff-create').hidden = !isAdmin;
-  $('shipment-detail').replaceChildren(el('p', 'Select a shipment to view its details.', 'muted'));
-  await loadList();
+  showEmptyDetail();
+  await Promise.all([loadList(), loadMetrics()]);
 }, $('portal-message'));
 
 bind($('create-staff-form'), async (values) => {
@@ -262,14 +285,44 @@ function route() {
 window.addEventListener('hashchange', route);
 route();
 
+function showEmptyDetail() {
+  const panel = el('div', undefined, 'detail-empty');
+  panel.append(el('h2', 'No shipment selected'), el('p', 'Select a shipment to view its details and tracking history.', 'muted'));
+  $('shipment-detail').replaceChildren(panel);
+}
+
+async function loadMetrics() {
+  const version = ++metricsVersion;
+  const midnight = new Date();
+  midnight.setHours(0, 0, 0, 0);
+  const today = 'pf_events?select=id&posted_at=gte.' + encodeURIComponent(midnight.toISOString());
+  const counts = {
+    'metric-shipments': 'pf_shipments?select=id',
+    'metric-updates': today,
+    'metric-deliveries': today + '&status=eq.Delivered'
+  };
+  await Promise.all(Object.entries(counts).map(async ([id, path]) => {
+    try {
+      const count = await staffRequest(path, { method: 'HEAD', prefer: 'count=exact' });
+      if (version === metricsVersion) $(id).textContent = count.toLocaleString();
+    } catch {
+      if (version === metricsVersion) $(id).textContent = '—';
+    }
+  }));
+}
+
 async function loadList(append = false) {
   const version = ++listVersion;
   const offset = append ? pageOffset : 0;
-  const rows = await staffRequest('pf_shipments?select=id,tracking_code,origin,destination&order=created_at.desc,id.desc&limit=' + (pageSize + 1) + '&offset=' + offset);
+  const filter = shipmentQuery ? '&tracking_code=eq.' + encodeURIComponent(shipmentQuery) : '';
+  const rows = await staffRequest('pf_shipments?select=id,tracking_code,origin,destination&order=created_at.desc,id.desc&limit=' + (pageSize + 1) + '&offset=' + offset + filter);
   if (version !== listVersion) return;
   const list = $('shipment-list');
   if (!append) list.replaceChildren();
-  if (!rows.length && !offset) list.append(el('p', isAdmin ? 'No shipments yet.' : 'No shipments are assigned to you.', 'muted'));
+  if (!rows.length && !offset) {
+    const empty = shipmentQuery ? 'No shipments match this tracking number.' : 'No shipments are available.';
+    list.append(el('p', empty, 'muted'));
+  }
   for (const shipment of rows.slice(0, pageSize)) {
     const item = button(shipment.origin + ' to ' + shipment.destination, () => openShipment(shipment.id), 'secondary shipment-button');
     item.dataset.shipment = shipment.id;
@@ -334,7 +387,11 @@ function shipmentForm(shipment) {
     });
     if (!rows?.length) throw new Error('The shipment could not be saved. Refresh your permissions and try again.');
     if (!session || currentShipment !== (id || null)) return;
-    await Promise.all([openShipment(rows[0].id), loadList()]);
+    if (!id) {
+      shipmentQuery = '';
+      $('shipment-search').reset();
+    }
+    await Promise.all([openShipment(rows[0].id), loadList(), loadMetrics()]);
     message($('portal-message'), id ? 'Shipment details saved.' : 'Shipment created.');
   }, shipment ? 'Save details' : 'Create shipment', grid,
   field('Internal reference', 'internal_reference', { max: 150, value: shipment?.internal_reference }));
@@ -344,7 +401,7 @@ function updatesForm(id) {
   return makeForm(async (values) => {
     await staffRequest('pf_events', { method: 'POST', body: { shipment_id: id, ...Object.fromEntries(values) } });
     if (currentShipment !== id) return;
-    await openShipment(id);
+    await Promise.all([openShipment(id), loadMetrics()]);
     message($('portal-message'), 'Tracking update published.');
   }, 'Publish update',
   field('Status', 'status', { choices: statuses, value: 'In transit' }),
@@ -390,7 +447,7 @@ function accessSection(id, staff) {
       }),
       button('Revoke access', () => setAccess(id, member.email, false, false, true), 'secondary danger')
     );
-    row.append(el('strong', member.email), el('p', rights.join(' · '), 'muted'), actions);
+    row.append(el('strong', member.email), el('p', rights.join(' Â· '), 'muted'), actions);
     section.append(row);
   }
   return section;
@@ -412,7 +469,7 @@ async function openShipment(id) {
   const version = ++detailVersion;
   selectShipment(id);
   const detail = $('shipment-detail');
-  detail.replaceChildren(el('p', 'Loading shipment…', 'muted'));
+  detail.replaceChildren(el('p', 'Loading shipmentâ€¦', 'muted'));
   try {
     const [rows, rights, events] = await Promise.all([
       staffRequest('pf_shipments?id=eq.' + id + '&select=*'),
@@ -431,19 +488,29 @@ async function openShipment(id) {
     if (version !== detailVersion) return;
 
     const header = el('div', undefined, 'section-header');
-    header.append(el('h2', shipment.origin + ' to ' + shipment.destination), el('span', events[0]?.status || 'Awaiting update', 'badge'));
+    header.append(el('h2', shipment.origin + ' to ' + shipment.destination), statusBadge(events[0]?.status));
     detail.replaceChildren(header, el('p', shipment.tracking_code, 'muted'));
-    const link = new URL(location.pathname, location.origin);
+    const link = new URL(location.href);
+    link.hash = '';
+    link.search = '';
     link.searchParams.set('tracking', shipment.tracking_code);
     const trackingLink = el('a', 'Open public tracking', 'text-button');
     trackingLink.href = link.href;
     trackingLink.target = '_blank';
     trackingLink.rel = 'noopener noreferrer';
-    detail.append(trackingLink);
+    const trackingActions = el('div', undefined, 'tracking-actions');
+    trackingActions.append(trackingLink);
+    if (navigator.clipboard) {
+      trackingActions.append(button('Copy tracking link', async () => {
+        await navigator.clipboard.writeText(link.href);
+        message($('portal-message'), 'Tracking link copied.');
+      }));
+    }
+    detail.append(trackingActions);
 
     const facts = [shipment.service, shipment.eta && 'Estimated delivery ' + dateOnly.format(new Date(shipment.eta)),
       shipment.internal_reference && 'Internal reference ' + shipment.internal_reference].filter(Boolean);
-    detail.append(el('p', facts.join(' · ')));
+    detail.append(el('p', facts.join(' Â· ')));
     if (rights.edit) {
       const section = el('section', undefined, 'detail-section');
       section.append(el('h3', 'Shipment details'), shipmentForm(shipment));
@@ -475,10 +542,19 @@ $('new-shipment').onclick = () => {
   $('shipment-detail').replaceChildren(el('h2', 'New shipment'), shipmentForm());
 };
 $('refresh-workspace').onclick = (event) => run(event.currentTarget, async () => {
-  if (currentShipment) await openShipment(currentShipment);
-  else await loadList();
-  if (currentShipment) await loadList();
+  await Promise.all([loadMetrics(), currentShipment ? openShipment(currentShipment) : Promise.resolve()]);
+  await loadList();
 });
+
+bind($('shipment-search'), async (values) => {
+  const query = values.get('query').trim().toUpperCase();
+  if (query && !/^[A-Z0-9-]+$/.test(query)) throw new Error('Use letters, numbers, and hyphens in the tracking number.');
+  shipmentQuery = query;
+  detailVersion++;
+  selectShipment(null);
+  showEmptyDetail();
+  await loadList();
+}, $('portal-message'));
 $('next-page').onclick = (event) => run(event.currentTarget, () => loadList(true));
 
 const trackingParam = new URLSearchParams(location.search).get('tracking');

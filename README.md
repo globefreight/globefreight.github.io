@@ -1,4 +1,4 @@
-# PrimeFreight Express
+# GlobeFreight Express
 
 A shipment-tracking website with a public timeline, separate staff and administrator sign-in modes, and a Supabase-backed team portal. The website uses your Supabase project URL and publishable key. It has no build step.
 
@@ -27,7 +27,7 @@ Sign in as administrator and open **Create staff login**. Enter the staff email 
 
 1. Put the contents of this folder, including the hidden `.github` subfolder, at the root of your GitHub repository and push to `main`.
 2. In the repository, go to **Settings → Pages** and select **GitHub Actions** as the source.
-3. Run **Deploy PrimeFreight Express** from the **Actions** tab if the initial push did not deploy. The workflow publishes only the `site/` directory and displays the resulting URL. The migration is applied separately in Supabase.
+3. Run **Deploy GlobeFreight Express** from the **Actions** tab if the initial push did not deploy. The workflow publishes only the `site/` directory and displays the resulting URL. The migration is applied separately in Supabase.
 
 To preview locally, run `python -m http.server 8000 --directory site` from this folder and visit `http://localhost:8000`. Use **Try a sample shipment** for a demonstration without a database. The sample is labeled and separate from customer records.
 

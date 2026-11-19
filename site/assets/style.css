@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
-:root{color-scheme:light;--navy:#102630;--deep:#091d26;--ink:#152a32;--muted:#4c626b;--teal:#006551;--lime:#c9f47c;--paper:#f3f7f7;--line:#dce7e7;--white:#fff;font:16px/1.55 Manrope,system-ui,sans-serif}
+:root{color-scheme:light;--navy:#102630;--deep:#091d26;--ink:#152a32;--muted:#4c626b;--teal:#006457;--lime:#baf381;--paper:#f3f7f7;--line:#dce7e7;--white:#fff;font:16px/1.55 Manrope,system-ui,sans-serif}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--paper);color:var(--ink);min-width:300px}
@@ -87,3 +87,39 @@ code{overflow-wrap:anywhere}
 .staff-create{margin-bottom:1rem}
 .staff-create summary{cursor:pointer;font-weight:800;font-size:1.125rem}
 .staff-create .status-message{margin-bottom:0}
+
+/* Team dashboard */
+.header{border-bottom:1px solid #29424b}
+.brand-mark{display:block;flex:none}
+.portal-heading{position:relative;isolation:isolate;overflow:hidden;padding:clamp(1.3rem,4vw,2.6rem);min-height:182px;border-radius:18px;color:#fff;background:radial-gradient(ellipse at 95% 30%,#126459 0%,transparent 55%),linear-gradient(112deg,#091f2b,#103540)}
+.portal-heading::before,.portal-heading::after{content:"";position:absolute;z-index:-1;pointer-events:none;border:1px solid #a3edba55;border-radius:50%;width:460px;height:218px;right:-60px;top:-60px;transform:rotate(-24deg)}
+.portal-heading::after{width:530px;height:310px;top:-47px;right:-125px;opacity:.6}
+.portal .eyebrow{color:#baf381}
+.portal .eyebrow span{background:#baf381}
+.portal-actions{display:flex;flex-wrap:wrap;gap:.55rem}
+.portal-actions #new-shipment{background:#baf381;color:#172b23}
+.portal-actions #logout{border-color:#598078;color:#fff;background:#13373e}
+.portal-identity{color:#d0e2e4;margin:.65rem 0 0;overflow-wrap:anywhere}
+.dashboard-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-bottom:1.1rem}
+.metric{display:flex;gap:.85rem;align-items:flex-start;padding:1.15rem;min-height:110px}
+.metric h2{font-family:Manrope,system-ui,sans-serif;font-size:.875rem;line-height:1.45;letter-spacing:0;color:var(--muted)}
+.metric strong{display:block;font:700 2rem/1.05 "Space Grotesk",system-ui,sans-serif;margin-top:.32rem}
+.metric-icon{flex:none;width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:#e5f4ed;color:var(--teal);font-size:1.25rem;font-weight:800}
+.list-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem}
+.list-heading .secondary,.shipment-search button{padding:.6rem .75rem}
+.shipment-search{margin-bottom:1rem}
+.shipment-search .input-row{display:flex;gap:.35rem}
+.shipment-search input{min-width:0}
+.workspace-grid{grid-template-columns:minmax(275px,1fr) minmax(0,2.25fr)}
+.shipment-button{border-color:var(--line);padding:.9rem}
+.shipment-button small{font-family:ui-monospace,monospace;font-size:.79rem}
+.detail-card{min-height:310px}
+.detail-empty{min-height:242px;display:grid;place-content:center;text-align:center}
+.detail-empty p{margin:.5rem 0 0}
+.tracking-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.75rem;margin-block:.75rem}
+.tracking-actions .text-button{margin-top:0}
+.badge[data-status="Delivered"]{background:#dcf5e4;color:#155630}
+.badge[data-status="Exception"],.badge[data-status="Returned"]{background:#fcebe6;color:#8a3025}
+.badge[data-status="In transit"],.badge[data-status="Out for delivery"]{background:#e4effa;color:#204e78}
+@media(max-width:760px){.workspace-grid{grid-template-columns:1fr}.dashboard-metrics{gap:.55rem}.metric{padding:.8rem;gap:.45rem;flex-direction:column}}
+@media(max-width:410px){.dashboard-metrics{grid-template-columns:1fr}.metric{flex-direction:row;min-height:0}}

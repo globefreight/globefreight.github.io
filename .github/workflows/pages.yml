@@ -1,4 +1,4 @@
-name: Deploy PrimeFreight Express
+name: Deploy GlobeFreight Express
 
 on:
   push:
@@ -23,6 +23,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        id: pages
+      - name: Set the public link preview URL
+        env:
+          PAGES_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          python3 - <<'PYTHON'
+          from html import escape
+          from os import environ
+          from pathlib import Path
+
+          url = environ['PAGES_URL'].rstrip('/')
+          if not url.startswith(('https://', 'http://')):
+              raise SystemExit('GitHub Pages did not return a site URL')
+          page = Path('site/index.html')
+          page.write_text(page.read_text().replace('__GLOBEFREIGHT_SITE_URL__', escape(url, quote=True)))
+          PYTHON
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
