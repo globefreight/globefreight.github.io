@@ -228,7 +228,7 @@ async function printShipmentLabel(shipment, url) {
   qr.addData(url.href);
   qr.make();
   const mark = el('img');
-  mark.src = siteAsset('globe-mark.svg?v=2');
+  mark.src = siteAsset('globe-mark.svg?v=3');
   mark.alt = '';
   const brand = el('p', undefined, 'label-brand');
   brand.append(mark, 'GlobeFreight Express');
