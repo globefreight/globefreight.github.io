@@ -41,7 +41,7 @@ label input:not([type=checkbox]),label select,label textarea{margin-top:.35rem}
 .milestones p{margin:.3rem 0 0}
 footer{background:var(--deep);color:#c8d9dd}
 .results{margin-top:1rem;max-width:900px}
-.result-header,.portal-heading,.section-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.portal-heading,.section-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 .badge{display:inline-block;border-radius:7px;padding:.25rem .55rem;background:#e6f3ec;color:#075845;font-weight:800;font-size:.875rem}
 .timeline{list-style:none;padding:0;margin:1.2rem 0 0}
 .timeline li{position:relative;padding:0 0 1.15rem 1.2rem;margin-left:.35rem;border-left:1px solid #aac6c0}
@@ -440,11 +440,53 @@ code{overflow-wrap:anywhere}
 .address-option:hover,.address-option:focus-visible{background:#e6f5f1}
 @media(max-width:1080px){.shipment-address-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.shipment-address .field-grid{grid-template-columns:1fr}}
-#tracking-result{min-width:0;overflow-wrap:anywhere}
-#tracking-result .result-header h2{min-width:0;max-width:100%}
-#tracking-result .badge{max-width:100%}
+/* Public shipment results */
+.page-tracking #tracking-result{min-width:0;overflow-wrap:anywhere;padding:0;overflow:hidden}
+.tracking-overview{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.7rem 1.25rem;padding:clamp(1rem,3vw,1.7rem);color:#fff;background:linear-gradient(113deg,#102538,#1b4854)}
+.tracking-identity{min-width:0}
+.tracking-identity p{margin:0 0 .35rem;color:#b7dbdb;font-weight:800;font-size:.875rem}
+.tracking-identity h2{font:700 clamp(.94rem,2vw,1.38rem)/1.35 ui-monospace,monospace;letter-spacing:0}
+.tracking-overview .badge{max-width:100%;padding:.4rem .7rem}
+.tracking-body{padding:clamp(1rem,3vw,1.7rem)}
+.tracking-route{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;margin:0}
+.tracking-route .tracking-fact{position:relative;padding:.75rem .85rem .75rem 2.05rem;background:#edf4f6;border:1px solid #dce8ed;border-radius:9px}
+.tracking-route .tracking-fact::before{content:"";position:absolute;left:.8rem;top:1.03rem;width:.54rem;height:.54rem;border:2px solid var(--teal);border-radius:50%}
+.tracking-route .tracking-fact:last-child::before{background:var(--teal)}
+.tracking-fact dt{color:var(--muted);font-weight:800;font-size:.875rem}
+.tracking-fact dd{margin:.25rem 0 0;font-weight:700;line-height:1.4}
+.tracking-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(185px,100%),1fr));gap:.65rem 1.1rem;margin:0;padding:1rem 0}
+.tracking-stages{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:0;margin:.15rem 0 1.15rem;border-block:1px solid var(--line);background:#f7fafb}
+.tracking-stages li{position:relative;text-align:center;padding:1.65rem .2rem .6rem;color:#536979;font-size:.875rem;font-weight:700;line-height:1.25}
+.tracking-stages li::before{content:"";position:absolute;top:.58rem;left:calc(50% - .3rem);z-index:1;width:.6rem;height:.6rem;border-radius:50%;border:2px solid #8aa1af;background:#f7fafb}
+.tracking-stages li:not(:last-child)::after{content:"";position:absolute;top:.84rem;left:50%;width:100%;border-top:1px solid #bccbd3}
+.tracking-stages li[data-state=recorded]::before{background:#176965;border-color:#176965}
+.tracking-stages li[data-state=current]{color:#075c59;font-weight:800}
+.tracking-stages li[data-state=current]::before{background:var(--teal);border-color:var(--teal);box-shadow:0 0 0 3px #bde6de}
+.tracking-visually-hidden{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.tracking-history-heading{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:.25rem .75rem}
+.tracking-history-heading h3{font-size:1.4rem}
+.tracking-history-heading p{margin:0;font-size:.875rem}
+.tracking-activity{list-style:none;margin:.85rem 0 0;padding:0}
+.tracking-activity li{position:relative;padding:0 0 .65rem 1.35rem}
+.tracking-activity li:last-child{padding-bottom:0}
+.tracking-activity li:not(:last-child)::after{content:"";position:absolute;left:.34rem;top:1rem;bottom:-1rem;border-left:1px solid #b8cdd4}
+.tracking-activity li::before{content:"";position:absolute;left:.09rem;top:.83rem;z-index:1;width:.55rem;height:.55rem;border:2px solid #859eab;border-radius:50%;background:white}
+.tracking-activity li:first-child::before{background:var(--teal);border-color:var(--teal);box-shadow:0 0 0 3px #d8eeea}
+.tracking-activity li[data-status=Exception]::before,.tracking-activity li[data-status=Returned]::before{background:#9b432b;border-color:#9b432b}
+.tracking-event{min-width:0;border:1px solid var(--line);border-radius:9px;background:#fff;padding:.7rem .85rem}
+.tracking-activity li:first-child .tracking-event{border-color:#9dccc5;background:#f2faf8}
+.tracking-event-header,.tracking-event-name{display:flex;flex-wrap:wrap;align-items:baseline;gap:.35rem .55rem}
+.tracking-event-header{justify-content:space-between}
+.tracking-event h4{margin:0;font-size:1rem}
+.tracking-event time,.tracking-event-location{font-size:.875rem;color:var(--muted)}
+.tracking-latest{font-size:.875rem;font-weight:800;color:#0b615b}
+.tracking-event p{margin:.3rem 0 0}
+.tracking-event-note{white-space:pre-wrap}
 @media(max-width:620px){
-  #tracking-result .result-header{display:grid;grid-template-columns:minmax(0,1fr);justify-items:start;gap:.55rem;padding-bottom:.7rem;border-bottom:1px solid var(--line)}
-  #tracking-result .result-header h2{font:700 clamp(.87rem,3.45vw,1.08rem)/1.4 ui-monospace,monospace;letter-spacing:0}
-  #tracking-result .timeline li{padding-left:.83rem}
+  .tracking-overview{align-items:flex-start;flex-direction:column}
+  .tracking-identity h2{font-size:clamp(.88rem,3.6vw,1.12rem)}
+  .tracking-route{grid-template-columns:minmax(0,1fr);gap:.45rem}
+  .tracking-stages li{padding-inline:.08rem;font-size:clamp(.69rem,3.18vw,.875rem);overflow-wrap:normal}
+  .tracking-activity li{padding-left:1.03rem}
+  .tracking-event{padding:.58rem .65rem}
 }

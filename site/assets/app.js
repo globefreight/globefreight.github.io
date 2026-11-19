@@ -145,15 +145,85 @@ function timeline(events) {
   return list;
 }
 
+const shipmentStages = [
+  ['Label created', ['Label created']],
+  ['Picked up', ['Picked up']],
+  ['In transit', ['In transit', 'Customs clearance']],
+  ['Out for delivery', ['Out for delivery']],
+  ['Delivered', ['Delivered']]
+];
+
+function trackingMilestones(events) {
+  const list = el('ol', undefined, 'tracking-stages');
+  list.setAttribute('aria-label', 'Recorded shipment milestones');
+  const seen = new Set(events.map(event => event.status));
+  for (const [label, statuses] of shipmentStages) {
+    const step = el('li', label);
+    const current = statuses.includes(events[0]?.status);
+    const recorded = statuses.some(status => seen.has(status));
+    step.dataset.state = current ? 'current' : recorded ? 'recorded' : 'pending';
+    if (current) step.setAttribute('aria-current', 'step');
+    else step.append(el('span', recorded ? ' (recorded)' : ' (not recorded)', 'tracking-visually-hidden'));
+    list.append(step);
+  }
+  return list;
+}
+
+function trackingFact(title, value) {
+  const cell = el('div', undefined, 'tracking-fact');
+  cell.append(el('dt', title), el('dd', value));
+  return cell;
+}
+
+function trackingHistory(events) {
+  const history = el('div', undefined, 'tracking-history');
+  const heading = el('div', undefined, 'tracking-history-heading');
+  heading.append(el('h3', 'Tracking history'),
+    el('p', events.length ? events.length + (events.length === 1 ? ' update · local time' : ' updates · local time') : 'No updates recorded', 'muted'));
+  history.append(heading);
+  if (!events.length) return history;
+
+  const list = el('ol', undefined, 'tracking-activity');
+  events.forEach((event, index) => {
+    const item = el('li');
+    item.dataset.status = event.status;
+    const card = el('div', undefined, 'tracking-event');
+    const header = el('div', undefined, 'tracking-event-header');
+    const time = el('time', dateTime.format(new Date(event.posted_at)));
+    time.dateTime = event.posted_at;
+    const name = el('div', undefined, 'tracking-event-name');
+    name.append(el('h4', event.status));
+    if (!index) name.append(el('span', 'Latest update', 'tracking-latest'));
+    header.append(name, time);
+    card.append(header);
+    if (event.location) card.append(el('p', event.location, 'tracking-event-location'));
+    if (event.note) card.append(el('p', event.note, 'tracking-event-note'));
+    item.append(card);
+    list.append(item);
+  });
+  history.append(list);
+  return history;
+}
+
 function showTracking(data) {
   const result = $('tracking-result');
-  const header = el('div', undefined, 'result-header');
-  header.append(el('h2', data.tracking_code), statusBadge(data.events[0]?.status));
-  result.replaceChildren(header, el('p', data.origin + ' to ' + data.destination + ' · ' + data.service, 'muted'));
-  if (data.eta) result.append(el('p', 'Estimated delivery ' + dateOnly.format(new Date(data.eta))));
-  if (data.pickup) result.append(el('p', 'Confirmed pickup: ' + dateTime.format(new Date(data.pickup.starts_at)) +
-    ' to ' + dateTime.format(new Date(data.pickup.ends_at))));
-  result.append(el('h3', 'Tracking history'), timeline(data.events));
+  const latest = data.events[0];
+  const overview = el('div', undefined, 'tracking-overview');
+  const identity = el('div', undefined, 'tracking-identity');
+  identity.append(el('p', 'Tracking number'), el('h2', data.tracking_code));
+  overview.append(identity, statusBadge(latest?.status));
+
+  const body = el('div', undefined, 'tracking-body');
+  const route = el('dl', undefined, 'tracking-route');
+  route.append(trackingFact('Origin', data.origin), trackingFact('Destination', data.destination));
+  const facts = el('dl', undefined, 'tracking-facts');
+  facts.append(trackingFact('Service', data.service));
+  if (data.eta) facts.append(trackingFact('Estimated delivery', dateOnly.format(new Date(data.eta))));
+  if (data.pickup) {
+    facts.append(trackingFact('Confirmed pickup', dateTime.formatRange(new Date(data.pickup.starts_at), new Date(data.pickup.ends_at))));
+  }
+  body.append(route, facts, trackingMilestones(data.events), trackingHistory(data.events));
+  result.replaceChildren(overview, body);
   result.hidden = false;
 }
 
