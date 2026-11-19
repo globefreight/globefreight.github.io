@@ -705,21 +705,18 @@ function applyBusinessDetails() {
   }
   const locations = $('design-print');
   const cards = locations.querySelectorAll('.location-card');
-  let verifiedAddresses = 0;
+  let confirmedLocations = 0;
   config.locations?.slice(0, cards.length).forEach((place, index) => {
     const card = cards[index];
     if (place.city?.trim()) card.querySelector('h3').textContent = place.city;
     if (!place.address?.trim()) return;
-    verifiedAddresses++;
+    if (place.confirmed === true) confirmedLocations++;
     card.querySelector('address').textContent = place.address;
     for (const [label, value] of [['Hours', place.hours], ['Services', place.services]]) {
       if (value?.trim()) card.append(el('p', label + ': ' + value, 'muted'));
     }
   });
-  if (verifiedAddresses === cards.length && cards.length) locations.querySelector('.section-intro').hidden = true;
-  if (verifiedAddresses > 0 && verifiedAddresses < cards.length) {
-    locations.querySelector('.section-intro').textContent = 'Full details are available for confirmed locations.';
-  }
+  if (confirmedLocations === cards.length && cards.length) locations.querySelector('.section-intro').hidden = true;
 }
 applyBusinessDetails();
 

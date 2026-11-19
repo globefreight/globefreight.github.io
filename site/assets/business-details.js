@@ -1,11 +1,11 @@
-// Add confirmed public business details here. Blank values stay hidden.
+// Set confirmed to true only for an approved GlobeFreight service location. Add verified contact details here. Blank values stay hidden.
 window.globeFreightDetails = {
   email: '',
   phone: '',
   hours: '',
   locations: [
-    { city: 'New York, NY', address: '', hours: '', services: '' },
-    { city: 'Houston, TX', address: '', hours: '', services: '' },
-    { city: 'Los Angeles, CA', address: '', hours: '', services: '' }
+    { city: 'New York, NY', address: '350 Fifth Avenue, New York, NY 10118', confirmed: false, hours: '', services: '' },
+    { city: 'Houston, TX', address: '901 Bagby Street, Houston, TX 77002', confirmed: false, hours: '', services: '' },
+    { city: 'Los Angeles, CA', address: '200 N Spring Street, Los Angeles, CA 90012', confirmed: false, hours: '', services: '' }
   ]
 };
