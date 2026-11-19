@@ -28,8 +28,9 @@
     <a class="brand" href="#" aria-label="GlobeFreight Express home"><img class="brand-mark" src="assets/globe-mark.svg?v=2" alt="" width="42" height="42"><span>GlobeFreight <small>EXPRESS</small></span></a>
     <nav class="main-nav" aria-label="Main navigation">
       <a href="#tracking">Track a shipment</a>
-      <a href="#milestones">Shipment milestones</a>
-      <a href="#tracking-help">Tracking help</a>
+      <a href="#about">About us</a>
+      <a href="#design-print">Design &amp; print</a>
+      <a href="#contact">Contact</a>
       <a class="portal-link" href="#portal">Team portal</a>
     </nav>
   </div>
@@ -96,11 +97,61 @@
         </div>
       </div>
     </section>
+    <section class="shell home-milestones" id="about" aria-labelledby="about-title">
+      <div class="company-panel">
+        <div>
+          <p class="eyebrow"><span></span> ABOUT US</p>
+          <h2 id="about-title">GlobeFreight Express</h2>
+          <p>GlobeFreight Express provides shipment tracking and customer support for freight customers. Use your tracking number to check recorded milestones, review delivery estimates, or report an issue to our team.</p>
+        </div>
+        <a class="section-cta" href="#tracking">Track a shipment</a>
+      </div>
+    </section>
+    <section class="home-help locations-section" id="design-print" aria-labelledby="locations-title">
+      <div class="shell">
+        <h2 id="locations-title">Design &amp; print locations</h2>
+        <p class="section-intro">U.S. location placeholders. Full addresses and hours are pending confirmation.</p>
+        <div class="location-grid">
+          <article class="card location-card"><h3>New York, NY</h3><address>Street address and ZIP pending<br>United States</address></article>
+          <article class="card location-card"><h3>Houston, TX</h3><address>Street address and ZIP pending<br>United States</address></article>
+          <article class="card location-card"><h3>Los Angeles, CA</h3><address>Street address and ZIP pending<br>United States</address></article>
+        </div>
+      </div>
+    </section>
+    <section class="shell contact-section" id="contact" aria-labelledby="contact-title">
+      <div>
+        <h2 id="contact-title">Contact us</h2>
+        <p class="section-intro">Report an issue with a shipment or send feedback about design and print. Include your tracking number if the issue relates to a shipment.</p>
+        <a class="text-button tracking-help-link" href="#tracking-help">Read tracking help</a>
+      </div>
+      <div class="card complaint-card">
+        <h3>Submit a complaint</h3>
+        <form id="complaint-form" class="fields">
+          <div class="field-grid">
+            <label>Full name <input name="customer" required maxlength="100" autocomplete="name"></label>
+            <label>Email <input name="email_address" type="email" required maxlength="254" autocomplete="email"></label>
+            <label>Tracking number (optional) <input name="tracking" maxlength="50" spellcheck="false"></label>
+            <label>Issue type
+              <select name="topic" required>
+                <option value="">Choose an issue</option>
+                <option>Shipment delay</option><option>Delivery issue</option><option>Loss or damage</option>
+                <option>Design and print</option><option>Other</option>
+              </select>
+            </label>
+          </div>
+          <label>What happened? <textarea name="details" rows="5" required minlength="10" maxlength="2000" aria-describedby="complaint-guidance"></textarea></label>
+          <p class="muted form-guidance" id="complaint-guidance">Include the details needed to review your issue. Leave out passwords, payment details, and identification numbers.</p>
+          <div><button type="submit">Submit complaint</button></div>
+        </form>
+        <p id="complaint-message" role="status" aria-live="polite" hidden></p>
+      </div>
+    </section>
   </div>
   <section id="portal-page" class="shell portal" aria-labelledby="portal-title" hidden>
     <div class="portal-heading">
       <div><p class="eyebrow"><span></span> GLOBEFREIGHT EXPRESS</p><h1 id="portal-title">Team portal</h1><p id="identity" class="portal-identity" hidden></p></div>
       <div class="portal-actions">
+        <button id="open-inbox" class="secondary portal-inbox-button" type="button" hidden>Complaints inbox</button>
         <button id="new-shipment" type="button" hidden>New shipment</button>
         <button type="button" class="secondary" id="logout" hidden>Sign out</button>
       </div>
@@ -119,38 +170,52 @@
       </form>
     </div>
     <div id="workspace" hidden>
-      <section class="dashboard-metrics" aria-label="Shipment overview">
-        <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 9L4 7.5M12 12l8-4.5M12 12v9"/></svg></span><div><h2 id="metric-shipments-label">Shipments</h2><strong id="metric-shipments">&mdash;</strong></div></article>
-        <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 12h4l3-6 3 12 2-6h4"/></svg></span><div><h2>Tracking updates today</h2><strong id="metric-updates">&mdash;</strong></div></article>
-        <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><div><h2>Deliveries recorded today</h2><strong id="metric-deliveries">&mdash;</strong></div></article>
+      <section class="card inbox-panel" id="complaint-inbox" aria-labelledby="inbox-title" hidden>
+        <div class="section-header">
+          <div><h2 id="inbox-title">Complaints inbox</h2><p id="inbox-scope" class="muted"></p></div>
+          <div class="actions">
+            <button id="refresh-inbox" class="secondary" type="button">Refresh</button>
+            <button id="close-inbox" class="secondary" type="button">Back to shipments</button>
+          </div>
+        </div>
+        <p id="inbox-message" role="status" hidden></p>
+        <div id="complaint-list"></div>
+        <button id="more-complaints" class="secondary" type="button" hidden>Load more complaints</button>
       </section>
-      <details class="card staff-create" id="staff-create" hidden>
-        <summary>Create staff login</summary>
-        <p class="muted">Create a login here, then assign the account to shipments under Staff access.</p>
-        <form id="create-staff-form" class="fields">
-          <div class="field-grid">
-            <label>Staff email <input name="email" type="email" required maxlength="254" autocomplete="off"></label>
-            <label>Initial password <input name="password" type="password" required minlength="12" maxlength="72" autocomplete="new-password"></label>
-          </div>
-          <div><button type="submit">Create staff account</button></div>
-        </form>
-        <p id="create-staff-message" role="status" hidden></p>
-      </details>
-      <div class="workspace-grid">
-        <aside class="card list-card">
-          <div class="list-heading">
-            <h2>Shipments</h2>
-            <button id="refresh-workspace" class="secondary" type="button">Refresh</button>
-          </div>
-          <form class="shipment-search" id="shipment-search">
-            <label for="shipment-query">Find by tracking number</label>
-            <div class="input-row"><input id="shipment-query" name="query" maxlength="50" placeholder="Tracking number" autocomplete="off">
-            <button type="submit" class="secondary">Find</button></div>
+      <div id="shipment-workspace">
+        <section class="dashboard-metrics" aria-label="Shipment overview">
+          <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 9L4 7.5M12 12l8-4.5M12 12v9"/></svg></span><div><h2 id="metric-shipments-label">Shipments</h2><strong id="metric-shipments">&mdash;</strong></div></article>
+          <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 12h4l3-6 3 12 2-6h4"/></svg></span><div><h2>Tracking updates today</h2><strong id="metric-updates">&mdash;</strong></div></article>
+          <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><div><h2>Deliveries recorded today</h2><strong id="metric-deliveries">&mdash;</strong></div></article>
+        </section>
+        <details class="card staff-create" id="staff-create" hidden>
+          <summary>Create staff login</summary>
+          <p class="muted">Create a login here, then assign the account to shipments under Staff access.</p>
+          <form id="create-staff-form" class="fields">
+            <div class="field-grid">
+              <label>Staff email <input name="email" type="email" required maxlength="254" autocomplete="off"></label>
+              <label>Initial password <input name="password" type="password" required minlength="12" maxlength="72" autocomplete="new-password"></label>
+            </div>
+            <div><button type="submit">Create staff account</button></div>
           </form>
-          <div id="shipment-list" aria-label="Available shipments"></div>
-          <button id="next-page" class="secondary" type="button" hidden>Load more</button>
-        </aside>
-        <div id="shipment-detail" class="card detail-card"></div>
+          <p id="create-staff-message" role="status" hidden></p>
+        </details>
+        <div class="workspace-grid">
+          <aside class="card list-card">
+            <div class="list-heading">
+              <h2>Shipments</h2>
+              <button id="refresh-workspace" class="secondary" type="button">Refresh</button>
+            </div>
+            <form class="shipment-search" id="shipment-search">
+              <label for="shipment-query">Find by tracking number</label>
+              <div class="input-row"><input id="shipment-query" name="query" maxlength="50" placeholder="Tracking number" autocomplete="off">
+              <button type="submit" class="secondary">Find</button></div>
+            </form>
+            <div id="shipment-list" aria-label="Available shipments"></div>
+            <button id="next-page" class="secondary" type="button" hidden>Load more</button>
+          </aside>
+          <div id="shipment-detail" class="card detail-card"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -163,6 +228,7 @@
       </div>
       <nav class="footer-nav" aria-label="Footer navigation">
         <div><h2>Shipments</h2><a href="#tracking">Track a shipment</a><a href="#milestones">Shipment milestones</a><a href="#tracking-help">Tracking help</a></div>
+        <div><h2>Company</h2><a href="#about">About us</a><a href="#design-print">Design &amp; print locations</a><a href="#contact">Contact and complaints</a></div>
         <div><h2>Team access</h2><a href="#portal">Admin and staff portal</a></div>
       </nav>
     </div>

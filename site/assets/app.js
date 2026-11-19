@@ -13,6 +13,8 @@ let currentShipment = null;
 let detailVersion = 0;
 let listVersion = 0;
 let metricsVersion = 0;
+let inboxVersion = 0;
+let complaintOffset = 0;
 let shipmentQuery = '';
 let pageOffset = 0;
 let trackingVersion = 0;
@@ -38,7 +40,8 @@ async function request(path, { method = 'GET', body, token, prefer } = {}) {
       throw new Error('Deploy the create-staff Edge Function in Supabase to enable account creation.');
     }
     if (data?.code === 'PGRST202' || data?.code === 'PGRST205') {
-      throw new Error('The GlobeFreight database setup is incomplete.');
+      const setup = path.includes('gf_') ? 'Apply the complaints migration in Supabase to enable this feature.' : 'The GlobeFreight database setup is incomplete.';
+      throw new Error(setup);
     }
     throw new Error(data?.message || data?.msg || data?.error_description || 'Request failed. Please try again.');
   }
@@ -126,7 +129,7 @@ function showTracking(data) {
   const result = $('tracking-result');
   const header = el('div', undefined, 'result-header');
   header.append(el('h2', data.tracking_code), statusBadge(data.events[0]?.status));
-  result.replaceChildren(header, el('p', data.origin + ' to ' + data.destination + ' Â· ' + data.service, 'muted'));
+  result.replaceChildren(header, el('p', data.origin + ' to ' + data.destination + ' · ' + data.service, 'muted'));
   if (data.eta) result.append(el('p', 'Estimated delivery ' + dateOnly.format(new Date(data.eta))));
   result.append(el('h3', 'Tracking history'), timeline(data.events));
   result.hidden = false;
@@ -167,6 +170,16 @@ bind($('track-form'), async (values) => {
   await track(code, version);
 }, $('track-message'));
 
+bind($('complaint-form'), async (values) => {
+  const body = Object.fromEntries(values);
+  for (const name of Object.keys(body)) body[name] = body[name].trim();
+  if (!body.customer || body.details.length < 10) throw new Error('Enter your name and at least 10 characters describing the issue.');
+  const id = await rpc('gf_submit_complaint', body, false);
+  if (!id) throw new Error('Could not confirm receipt. Please try again.');
+  $('complaint-form').reset();
+  message($('complaint-message'), 'Complaint received. Save your reference: ' + complaintReference(id));
+}, $('complaint-message'));
+
 function chooseMode(mode) {
   loginMode = mode;
   $('signin-title').textContent = mode === 'admin' ? 'Administrator sign-in' : 'Staff sign-in';
@@ -201,6 +214,8 @@ function clearSession() {
   $('next-page').hidden = true;
   $('signin-card').hidden = false;
   $('workspace').hidden = true;
+  $('open-inbox').hidden = true;
+  closeComplaintInbox();
   $('logout').hidden = true;
 }
 
@@ -217,13 +232,14 @@ bind($('signin-form'), async (values) => {
   session = { ...auth, expiresAt: Date.now() + (auth.expires_in - 10) * 1000 };
   isAdmin = rights.admin;
   $('signin-form').reset();
-  $('identity').textContent = (isAdmin ? 'Administrator' : 'Staff') + ' Â· ' + auth.user.email;
+  $('identity').textContent = (isAdmin ? 'Administrator' : 'Staff') + ' · ' + auth.user.email;
   $('identity').hidden = false;
   $('portal-title').textContent = isAdmin ? 'Operations dashboard' : 'Shipment dashboard';
   $('metric-shipments-label').textContent = isAdmin ? 'Total shipments' : 'Assigned shipments';
   $('signin-card').hidden = true;
   $('workspace').hidden = false;
   $('logout').hidden = false;
+  $('open-inbox').hidden = false;
   $('new-shipment').hidden = !isAdmin;
   $('staff-create').hidden = !isAdmin;
   showEmptyDetail();
@@ -268,6 +284,10 @@ function route() {
   $('public-page').hidden = portal;
   $('portal-page').hidden = !portal;
   if (portal || (wasInPortal && !location.hash)) window.scrollTo(0, 0);
+  if (!portal && wasInPortal && !$('complaint-inbox').hidden) {
+    closeComplaintInbox();
+    $('open-inbox').hidden = !session;
+  }
   if (!portal && wasInPortal && location.hash) {
     $(location.hash.slice(1))?.scrollIntoView();
   }
@@ -348,13 +368,17 @@ function field(labelText, name, options = {}) {
 }
 
 function makeForm(action, label, ...fields) {
+  return makeActionForm($('portal-message'), action, label, ...fields);
+}
+
+function makeActionForm(target, action, label, ...fields) {
   const form = el('form', undefined, 'fields');
   const actions = el('div');
   const submit = el('button', label);
   submit.type = 'submit';
   actions.append(submit);
   form.append(...fields, actions);
-  bind(form, action, $('portal-message'));
+  bind(form, action, target);
   return form;
 }
 
@@ -437,7 +461,7 @@ function accessSection(id, staff) {
       }),
       button('Revoke access', () => setAccess(id, member.email, false, false, true), 'secondary danger')
     );
-    row.append(el('strong', member.email), el('p', rights.join(' Â· '), 'muted'), actions);
+    row.append(el('strong', member.email), el('p', rights.join(' · '), 'muted'), actions);
     section.append(row);
   }
   return section;
@@ -500,7 +524,7 @@ async function openShipment(id) {
 
     const facts = [shipment.service, shipment.eta && 'Estimated delivery ' + dateOnly.format(new Date(shipment.eta)),
       shipment.internal_reference && 'Internal reference ' + shipment.internal_reference].filter(Boolean);
-    detail.append(el('p', facts.join(' Â· ')));
+    detail.append(el('p', facts.join(' · ')));
     if (rights.edit) {
       const section = el('section', undefined, 'detail-section');
       section.append(el('h3', 'Shipment details'), shipmentForm(shipment));
@@ -526,6 +550,8 @@ async function openShipment(id) {
 
 $('new-shipment').onclick = () => {
   if (!isAdmin) return;
+  closeComplaintInbox();
+  $('open-inbox').hidden = false;
   detailVersion++;
   selectShipment(null);
   message($('portal-message'));
@@ -546,6 +572,106 @@ bind($('shipment-search'), async (values) => {
   await loadList();
 }, $('portal-message'));
 $('next-page').onclick = (event) => run(event.currentTarget, () => loadList(true));
+
+const complaintsPerPage = 20;
+
+function complaintReference(id) {
+  return 'GF-' + id.toUpperCase();
+}
+
+function closeComplaintInbox() {
+  inboxVersion++;
+  complaintOffset = 0;
+  $('complaint-inbox').hidden = true;
+  $('shipment-workspace').hidden = false;
+  $('new-shipment').hidden = !isAdmin;
+  $('complaint-list').replaceChildren();
+  $('more-complaints').hidden = true;
+  message($('inbox-message'));
+}
+
+function complaintRecord(record) {
+  const card = el('details', undefined, 'complaint-record');
+  const summary = el('summary', record.category + ' ');
+  summary.append(statusBadge(record.status));
+  const customer = el('p', record.customer_name + ' | ' + record.customer_email);
+  const reference = el('p', complaintReference(record.id), 'muted');
+  const received = el('p', 'Received ' + dateTime.format(new Date(record.received_at)), 'muted');
+  const tracking = el('p', 'Tracking number: ' + (record.tracking_code || 'Not provided'));
+  const assignment = el('p', 'Assigned to: ' + (record.assigned_email || 'Admin queue'));
+  const description = el('p', record.description, 'case-description');
+  card.append(summary, reference, received, customer, tracking, assignment, description);
+  const work = el('section', undefined, 'detail-section');
+  work.append(el('h3', 'Handle complaint'));
+  work.append(makeActionForm($('inbox-message'), async (values) => {
+    const activeSession = session;
+    const query = 'gf_complaints?id=eq.' + record.id + '&updated_at=eq.' + encodeURIComponent(record.updated_at);
+    const updated = await staffRequest(query, {
+      method: 'PATCH',
+      body: { status: values.get('status'), internal_note: values.get('internal_note').trim() },
+      prefer: 'return=representation'
+    });
+    if (!updated?.length) throw new Error('This complaint changed or your access was removed. Refresh the inbox.');
+    if (session === activeSession && !$('complaint-inbox').hidden) {
+      await loadComplaintInbox(false, record.id);
+      message($('inbox-message'), 'Complaint saved.');
+    }
+  }, 'Save complaint',
+  field('Status', 'status', { choices: ['Open', 'In review', 'Resolved'], value: record.status }),
+  field('Internal note', 'internal_note', { multiline: true, max: 2000, value: record.internal_note })));
+  card.append(work);
+  if (isAdmin) {
+    const assign = el('section', undefined, 'detail-section');
+    assign.append(el('h3', 'Assignment'), el('p', 'Enter a confirmed staff email or leave the field empty to handle the complaint in the admin queue.', 'muted'));
+    assign.append(makeActionForm($('inbox-message'), async (values) => {
+      const activeSession = session;
+      const email = values.get('staff_email').trim();
+      await rpc('gf_assign_complaint', { case_id: record.id, staff_email: email, expected_update: record.updated_at });
+      if (session === activeSession && !$('complaint-inbox').hidden) {
+        await loadComplaintInbox(false, record.id);
+        message($('inbox-message'), email ? 'Complaint assigned.' : 'Complaint moved to the admin queue.');
+      }
+    }, 'Save assignment', field('Staff email', 'staff_email', { type: 'email', max: 254, value: record.assigned_email || '' })));
+    card.append(assign);
+  }
+  return card;
+}
+
+async function loadComplaintInbox(append = false, reopenId = null) {
+  const version = ++inboxVersion;
+  const offset = append ? complaintOffset : 0;
+  const limit = complaintsPerPage + 1;
+  const rows = await staffRequest('gf_complaints?select=*&order=received_at.desc,id.desc&offset=' + offset + '&limit=' + limit);
+  if (version !== inboxVersion || $('complaint-inbox').hidden) return;
+  const list = $('complaint-list');
+  if (!append) list.replaceChildren();
+  if (!rows.length && !offset) list.append(el('p', isAdmin ? 'No complaints received yet.' : 'No complaints are assigned to you.', 'muted'));
+  for (const record of rows.slice(0, complaintsPerPage)) {
+    const card = complaintRecord(record);
+    card.open = reopenId === record.id;
+    list.append(card);
+  }
+  complaintOffset = offset + complaintsPerPage;
+  $('more-complaints').hidden = rows.length <= complaintsPerPage;
+}
+
+$('open-inbox').onclick = (event) => run(event.currentTarget, async () => {
+  $('shipment-workspace').hidden = true;
+  $('complaint-inbox').hidden = false;
+  $('inbox-scope').textContent = isAdmin ? 'Review customer complaints and manage assignments.' : 'Review complaints assigned to you.';
+  $('open-inbox').hidden = true;
+  message($('portal-message'));
+  await loadComplaintInbox();
+}, $('inbox-message'));
+
+$('close-inbox').onclick = () => {
+  closeComplaintInbox();
+  $('open-inbox').hidden = false;
+  $('open-inbox').focus();
+};
+
+$('refresh-inbox').onclick = (event) => run(event.currentTarget, () => loadComplaintInbox(), $('inbox-message'));
+$('more-complaints').onclick = (event) => run(event.currentTarget, () => loadComplaintInbox(true), $('inbox-message'));
 
 const trackingParam = new URLSearchParams(location.search).get('tracking');
 if (trackingParam && trackingParam.length <= 50) {

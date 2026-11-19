@@ -17,6 +17,15 @@ A shipment-tracking website with a public timeline, separate staff and administr
 4. To disable a staff account across all shipments, use Supabase Auth account controls and remove its shipment grants. For a permanent offboarding, deleting the Auth user removes all corresponding grants automatically. The migration keeps shipment events if their author account is removed.
 5. Use city or facility names in public location fields and keep customer names, addresses, and contact details out of public fields. A tracking link shares the route, ETA, and published timeline with anyone holding the link. Internal references appear only in the authorized workspace. Keep the private schema out of the Data API exposed schema list. Restrict public Auth signups if your project is dedicated to this team.
 
+## Enable the customer complaints inbox
+
+1. In Supabase SQL Editor, run [the complaints migration](supabase/migrations/20261119000100_globefreight_complaints.sql) after the original shipment migration. If shipments are already configured, apply only the new complaints migration.
+2. From the homepage, open **Contact** and submit a test complaint. The page displays a reference and the case appears in **Team portal → Complaints inbox**.
+3. As administrator, open the case to set its status or add an internal note. Assign it to a confirmed staff email, or leave the staff email blank to bring it back to the admin queue. Staff see only their assigned cases.
+4. Replace the three placeholder U.S. locations in `site/index.html` with your verified business addresses and hours before inviting customers to visit.
+
+Customer complaints are stored in Supabase for the signed-in team. Submission creates an inbox entry and a reference on screen.
+
 ## Deploy staff account creation in Supabase
 
 In **Edge Functions**, choose **Deploy a new function → Via Editor**. Name it `create-staff` and replace the editor contents with [the included function](supabase/functions/create-staff/index.ts), then deploy it. In the function's **Details** tab, turn off **Verify JWT with legacy secret**. The handler verifies the Supabase Auth session itself and checks the live administrator role before creating an account. It uses Supabase's built-in server-side credentials. No Node.js or PowerShell is needed.

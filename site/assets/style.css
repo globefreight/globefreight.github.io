@@ -157,3 +157,29 @@ code{overflow-wrap:anywhere}
 .footer-bottom a:hover{text-decoration:underline}
 @media(max-width:780px){.header-inner{flex-wrap:wrap;gap:.85rem;padding-block:.85rem}.main-nav{flex-wrap:wrap}.home-milestones .milestones{grid-template-columns:1fr}.help-grid{grid-template-columns:1fr}}
 @media(max-width:480px){.main-nav a:first-child{display:inline}.main-nav{gap:.45rem .8rem}.main-nav .portal-link{padding:.35rem .55rem}.footer-grid{grid-template-columns:1fr;gap:1.1rem}}
+.company-panel{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;border-radius:18px;padding:clamp(1.3rem,4vw,2.5rem);background:linear-gradient(114deg,#091d26,#10574e);color:#fff}
+.company-panel .eyebrow{color:var(--lime)}
+.company-panel p:last-child{max-width:64ch;margin:.85rem 0 0;color:#e0eeed}
+.section-cta{flex:none;display:inline-block;background:var(--lime);color:var(--deep);padding:.75rem 1rem;border-radius:8px;font-weight:800}
+.section-cta:hover{text-decoration:underline}
+.location-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.25rem}
+.location-card{padding:1.25rem}
+.location-card address{font-style:normal;color:var(--muted);margin-top:.55rem}
+.contact-section{display:grid;grid-template-columns:minmax(210px,1fr) minmax(0,1.7fr);gap:clamp(1rem,4vw,3rem);padding-block:clamp(2.5rem,6vw,4.25rem)}
+.contact-section h2{font-size:clamp(1.9rem,4.5vw,2.65rem)}
+.contact-section h3{font-size:1.45rem}
+.form-guidance{margin:0;font-size:.9rem}
+.footer-nav{grid-template-columns:repeat(3,minmax(0,1fr))}
+.portal-actions .portal-inbox-button{background:#13373e;color:#fff;border-color:#598078}
+.inbox-panel .section-header{border-bottom:1px solid var(--line);padding-bottom:1rem}
+.inbox-panel .section-header p,.inbox-panel .actions{margin:.45rem 0 0}
+.complaint-record{border:1px solid var(--line);border-radius:10px;margin-block:.8rem;padding:.9rem 1rem;overflow-wrap:anywhere}
+.complaint-record summary{cursor:pointer;font-weight:800}
+.complaint-record summary .badge{margin-left:.5rem}
+.complaint-record .case-description{white-space:pre-wrap}
+.complaint-record .detail-section{margin-top:1rem;padding-top:.85rem}
+@media(max-width:780px){.contact-section{grid-template-columns:1fr}.location-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr;gap:1.25rem}}
+@media(max-width:500px){.company-panel{flex-direction:column;align-items:flex-start}.footer-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.main-nav{gap:.4rem .7rem}}
+.badge[data-status="Open"]{background:#fff1db;color:#754817}
+.badge[data-status="In review"]{background:#e4effa;color:#204e78}
+.badge[data-status="Resolved"]{background:#dcf5e4;color:#155630}
