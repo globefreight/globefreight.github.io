@@ -1033,7 +1033,7 @@ for (const button of document.querySelectorAll('[data-dashboard-tab],[data-dashb
     showDashboardView(button.dataset.dashboardTab || button.dataset.dashboardOpen);
   });
 }
-for (const link of document.querySelectorAll('.main-nav a,.footer-nav a,.header-service a')) {
+for (const link of document.querySelectorAll('.main-nav a,.footer-nav a')) {
   const routeName = link.dataset.homeLink !== undefined ? 'home' : link.getAttribute('href')?.slice(1);
   if (Object.hasOwn(pagePaths, routeName)) link.dataset.currentRoute = routeName;
 }
