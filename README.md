@@ -96,6 +96,10 @@ Test with addresses you control before opening the form to customers. The queue 
 
 Country and region data from [country-region-data 4.1.0](https://github.com/country-regions/country-region-data), available under the MIT license.
 
+## Switch shipment tracking numbers to GF
+
+Apply [the GF tracking migration](supabase/migrations/20261119000700_globefreight_tracking_prefix.sql) after the earlier migrations. New shipments receive GF tracking numbers, and existing PF numbers are converted to GF. Previously shared PF tracking links and printed QR codes continue to work through a private alias. The public tracking result displays the current GF number.
+
 ## Deploy staff account creation in Supabase
 
 In **Edge Functions**, choose **Deploy a new function → Via Editor**. Name it `create-staff` and replace the editor contents with [the included function](supabase/functions/create-staff/index.ts), then deploy it. In the function's **Details** tab, turn off **Verify JWT with legacy secret**. The handler verifies the Supabase Auth session itself and checks the live administrator role before creating an account. It uses Supabase's built-in server-side credentials. No Node.js or PowerShell is needed.
