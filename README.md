@@ -26,6 +26,44 @@ A shipment-tracking website with a public timeline, separate staff and administr
 
 Customer complaints are stored in Supabase for the signed-in team. Submission creates an inbox entry and a reference on screen.
 
+## Enable quotes, shipment emails, delivery documents, and the activity log
+
+1. Run [the operations migration](supabase/migrations/20261119000200_globefreight_operations.sql) in SQL Editor after the shipment and complaint migrations. Run each new migration once.
+2. Edit [business-details.js](site/assets/business-details.js) with the verified business email, phone, support hours, and actual addresses, hours, and service lists. Blank contact fields are hidden. Placeholder city cards remain labeled until addresses are provided.
+3. Submit a test quote from the homepage. Review it in **Team portal → Quote requests** and update its status. The **Admin activity log** records new activity after the migration.
+4. In a shipment's **Shipment email notifications** panel, save the confirmed recipient email to queue the tracking link and future milestone emails. After recording **Delivered**, administrators and staff with tracking-update permission can attach a PDF, PNG, or JPEG up to 2 MB. The recipient's email link expires seven days after upload. Anyone with that link can download the document until it expires, is replaced, or the recipient changes. The public tracking timeline contains no document link.
+5. Open a case in **Complaints inbox** to email its customer. Replies appear as **Queued**, **Accepted by email provider**, or **Failed**. The configured support mailbox receives customer replies to these emails.
+
+### Configure outbound email
+
+Verify your sending domain in Resend and create a sending key. In Supabase **Edge Functions → Secrets**, set these server-side values:
+
+| Secret | Value |
+|---|---|
+| `RESEND_API_KEY` | Your Resend sending key |
+| `GF_MAIL_FROM` | Sender on your verified domain, e.g. `GlobeFreight Express <updates@your-domain.example>` |
+| `GF_SUPPORT_EMAIL` | The monitored mailbox that receives customer replies |
+| `GF_SITE_URL` | Your published HTTPS website URL, including any GitHub Pages project path |
+| `GF_MAIL_JOB_SECRET` | A randomly generated secret of at least 32 characters used only by your scheduled job |
+
+In **Edge Functions**, deploy [send-globefreight-email](supabase/functions/send-globefreight-email/index.ts) via the dashboard editor. Turn off **Verify JWT with legacy secret** for this function. It authenticates the scheduled job using the `x-job-secret` header and uses a server-side Supabase credential. Keep all email credentials out of GitHub and browser code.
+
+Use Supabase Vault to save the same job secret under the name `gf_mail_job_secret`. In Supabase Cron, enable the Cron and `pg_net` extensions and schedule the following SQL as a job that runs every minute. Use the actual Edge Function URL if deploying to another project.
+
+```sql
+select net.http_post(
+  url := 'https://wqxbwpilkmwgagqbdxud.supabase.co/functions/v1/send-globefreight-email',
+  headers := jsonb_build_object(
+    'Content-Type', 'application/json',
+    'x-job-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'gf_mail_job_secret')
+  ),
+  body := '{}'::jsonb,
+  timeout_milliseconds := 70000
+);
+```
+
+Test with addresses you control before opening the form to customers. The queue records provider acceptance for complaint replies. Monitor delivery and bounce information in Resend. Customer email acknowledgements do not repeat complaint descriptions.
+
 ## Deploy staff account creation in Supabase
 
 In **Edge Functions**, choose **Deploy a new function → Via Editor**. Name it `create-staff` and replace the editor contents with [the included function](supabase/functions/create-staff/index.ts), then deploy it. In the function's **Details** tab, turn off **Verify JWT with legacy secret**. The handler verifies the Supabase Auth session itself and checks the live administrator role before creating an account. It uses Supabase's built-in server-side credentials. No Node.js or PowerShell is needed.

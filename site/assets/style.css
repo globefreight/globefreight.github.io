@@ -183,3 +183,17 @@ code{overflow-wrap:anywhere}
 .badge[data-status="Open"]{background:#fff1db;color:#754817}
 .badge[data-status="In review"]{background:#e4effa;color:#204e78}
 .badge[data-status="Resolved"]{background:#dcf5e4;color:#155630}
+#quote{border-bottom:1px solid var(--line)}
+#quote .fields{margin-top:0}
+#quote h2{font-size:clamp(1.9rem,4.5vw,2.65rem)}
+.admin-operations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:1rem;margin-bottom:1rem}
+.admin-operations>details{padding:1.15rem}
+.admin-operations summary{cursor:pointer;font-weight:800}
+.admin-operations .record{padding:.85rem 0}
+.admin-operations .record:last-child{border-bottom:0}
+.reply-history{padding-left:1.4rem}
+.reply-history p{margin:.35rem 0;white-space:pre-wrap}
+.location-card address{white-space:pre-line}
+#business-contact p{margin:.65rem 0}
+#business-contact a{text-decoration:underline}
+@media(max-width:760px){.admin-operations{grid-template-columns:1fr}}

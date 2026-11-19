@@ -40,7 +40,7 @@ async function request(path, { method = 'GET', body, token, prefer } = {}) {
       throw new Error('Deploy the create-staff Edge Function in Supabase to enable account creation.');
     }
     if (data?.code === 'PGRST202' || data?.code === 'PGRST205') {
-      const setup = path.includes('gf_') ? 'Apply the complaints migration in Supabase to enable this feature.' : 'The GlobeFreight database setup is incomplete.';
+      const setup = path.includes('gf_') ? 'Apply the latest GlobeFreight migrations in Supabase to enable this feature.' : 'The GlobeFreight database setup is incomplete.';
       throw new Error(setup);
     }
     throw new Error(data?.message || data?.msg || data?.error_description || 'Request failed. Please try again.');
@@ -215,6 +215,7 @@ function clearSession() {
   $('signin-card').hidden = false;
   $('workspace').hidden = true;
   $('open-inbox').hidden = true;
+  clearAdminOperations();
   closeComplaintInbox();
   $('logout').hidden = true;
 }
@@ -233,6 +234,7 @@ bind($('signin-form'), async (values) => {
   isAdmin = rights.admin;
   $('signin-form').reset();
   $('identity').textContent = (isAdmin ? 'Administrator' : 'Staff') + ' · ' + auth.user.email;
+  $('admin-operations').hidden = !isAdmin;
   $('identity').hidden = false;
   $('portal-title').textContent = isAdmin ? 'Operations dashboard' : 'Shipment dashboard';
   $('metric-shipments-label').textContent = isAdmin ? 'Total shipments' : 'Assigned shipments';
@@ -280,15 +282,18 @@ $('logout').onclick = async () => {
 
 function route() {
   const portal = location.hash === '#portal';
-  const wasInPortal = $('public-page').hidden;
-  $('public-page').hidden = portal;
+  const delivery = location.hash.startsWith('#delivery=');
+  const wasOnPrivatePage = $('public-page').hidden;
+  $('public-page').hidden = portal || delivery;
   $('portal-page').hidden = !portal;
-  if (portal || (wasInPortal && !location.hash)) window.scrollTo(0, 0);
-  if (!portal && wasInPortal && !$('complaint-inbox').hidden) {
+  $('delivery-page').hidden = !delivery;
+  if (delivery) message($('delivery-message'));
+  if (portal || delivery || (wasOnPrivatePage && !location.hash)) window.scrollTo(0, 0);
+  if (!portal && wasOnPrivatePage && !$('complaint-inbox').hidden) {
     closeComplaintInbox();
     $('open-inbox').hidden = !session;
   }
-  if (!portal && wasInPortal && location.hash) {
+  if (!portal && !delivery && wasOnPrivatePage && location.hash) {
     $(location.hash.slice(1))?.scrollIntoView();
   }
 }
@@ -360,6 +365,7 @@ function field(labelText, name, options = {}) {
   } else if (!options.multiline) {
     input.type = options.type || 'text';
   }
+  if (options.accept) input.accept = options.accept;
   if (options.max) input.maxLength = options.max;
   if (options.required) input.required = true;
   if (options.value !== undefined) input.value = options.value ?? '';
@@ -539,7 +545,8 @@ async function openShipment(id) {
     const history = el('section', undefined, 'detail-section');
     history.append(el('h3', 'Tracking history'), timeline(events));
     detail.append(history);
-    if (rights.admin) detail.append(accessSection(id, staff));
+    if (rights.admin) detail.append(recipientSection(id), accessSection(id, staff));
+    if (rights.post && events[0]?.status === 'Delivered') detail.append(proofSection(id));
   } catch (error) {
     if (version !== detailVersion) return;
     detail.replaceChildren(el('p', 'Shipment details could not be loaded.', 'muted'),
@@ -619,7 +626,7 @@ function complaintRecord(record) {
   }, 'Save complaint',
   field('Status', 'status', { choices: ['Open', 'In review', 'Resolved'], value: record.status }),
   field('Internal note', 'internal_note', { multiline: true, max: 2000, value: record.internal_note })));
-  card.append(work);
+  card.append(work, complaintReplies(record));
   if (isAdmin) {
     const assign = el('section', undefined, 'detail-section');
     assign.append(el('h3', 'Assignment'), el('p', 'Enter a confirmed staff email or leave the field empty to handle the complaint in the admin queue.', 'muted'));
@@ -672,6 +679,224 @@ $('close-inbox').onclick = () => {
 
 $('refresh-inbox').onclick = (event) => run(event.currentTarget, () => loadComplaintInbox(), $('inbox-message'));
 $('more-complaints').onclick = (event) => run(event.currentTarget, () => loadComplaintInbox(true), $('inbox-message'));
+
+function operation(op, payload, signedIn = true) {
+  return rpc('gf_operations', { op, payload }, signedIn);
+}
+
+function applyBusinessDetails() {
+  const config = window.globeFreightDetails;
+  if (!config) return;
+  const contact = $('business-contact');
+  for (const [label, value, scheme] of [
+    ['Email', config.email, 'mailto:'], ['Phone', config.phone, 'tel:'], ['Hours', config.hours, '']
+  ]) {
+    if (!value?.trim()) continue;
+    const line = el('p', label + ': ');
+    if (scheme) {
+      const link = el('a', value);
+      link.href = scheme + (scheme === 'tel:' ? value.replace(/[^+\d]/g, '') : encodeURIComponent(value));
+      line.append(link);
+    } else {
+      line.append(value);
+    }
+    contact.append(line);
+    contact.hidden = false;
+  }
+  const locations = $('design-print');
+  const cards = locations.querySelectorAll('.location-card');
+  let verifiedAddresses = 0;
+  config.locations?.slice(0, cards.length).forEach((place, index) => {
+    const card = cards[index];
+    if (place.city?.trim()) card.querySelector('h3').textContent = place.city;
+    if (!place.address?.trim()) return;
+    verifiedAddresses++;
+    card.querySelector('address').textContent = place.address;
+    for (const [label, value] of [['Hours', place.hours], ['Services', place.services]]) {
+      if (value?.trim()) card.append(el('p', label + ': ' + value, 'muted'));
+    }
+  });
+  if (verifiedAddresses === cards.length && cards.length) locations.querySelector('.section-intro').hidden = true;
+  if (verifiedAddresses > 0 && verifiedAddresses < cards.length) {
+    locations.querySelector('.section-intro').textContent = 'Full details are available for confirmed locations.';
+  }
+}
+applyBusinessDetails();
+
+bind($('quote-form'), async (values) => {
+  const data = Object.fromEntries(values);
+  const id = await operation('quote', data, false);
+  if (!id) throw new Error('Could not confirm receipt. Please try again.');
+  $('quote-form').reset();
+  message($('quote-message'), 'Quote request received. Your reference is GFQ-' + id.toUpperCase() + '.');
+}, $('quote-message'));
+
+function recipientSection(id) {
+  const section = el('details', undefined, 'detail-section');
+  const content = el('div');
+  const feedback = el('p');
+  message(feedback);
+  section.append(el('summary', 'Shipment email notifications'), content, feedback);
+  section.addEventListener('toggle', async () => {
+    if (!section.open || content.children.length) return;
+    try {
+      const email = await operation('recipient', { id });
+      content.append(el('p', 'Enter the confirmed recipient email. This queues the tracking link and future updates. Clear the address to stop future notifications.', 'muted'));
+      content.append(makeActionForm(feedback, async (values) => {
+        const address = values.get('email').trim();
+        await operation('set-recipient', { id, email: address });
+        message(feedback, address ? 'Recipient saved and email queued if the address changed.' : 'Shipment email notifications disabled.');
+      }, 'Save recipient', field('Recipient email', 'email', { type: 'email', max: 254, value: email || '' })));
+    } catch (error) {
+      message(feedback, error.message, true);
+    }
+  });
+  return section;
+}
+
+function proofSection(id) {
+  const section = el('section', undefined, 'detail-section');
+  const feedback = el('p');
+  message(feedback);
+  section.append(el('h3', 'Proof of delivery'),
+    el('p', 'Upload a PDF, PNG, or JPEG up to 2 MB. The recipient gets a private link valid for seven days. A replacement disables the previous link.', 'muted'));
+  section.append(makeActionForm(feedback, async (values) => {
+    const file = values.get('document');
+    if (!file?.size || file.size > 2097152 || !['application/pdf','image/png','image/jpeg'].includes(file.type)) {
+      throw new Error('Choose a PDF, PNG, or JPEG up to 2 MB.');
+    }
+    const view = new Uint8Array(await file.arrayBuffer());
+    const chunks = [];
+    for (let offset = 0; offset < view.length; offset += 8192) {
+      chunks.push(String.fromCharCode(...view.subarray(offset, offset + 8192)));
+    }
+    await operation('proof', { id, mime: file.type, data: btoa(chunks.join('')) });
+    section.querySelector('form').reset();
+    message(feedback, 'Delivery document saved. Its private link is queued for email.');
+  }, 'Upload and queue delivery link',
+  field('Delivery document', 'document', { type: 'file', required: true, accept: 'application/pdf,image/png,image/jpeg' })));
+  section.append(feedback);
+  return section;
+}
+
+$('download-proof').onclick = (event) => run(event.currentTarget, async () => {
+  const token = location.hash.slice('#delivery='.length);
+  if (!/^[0-9a-f]{64}$/.test(token)) throw new Error('This delivery link is invalid.');
+  const documentData = await operation('download', { token }, false);
+  if (location.hash !== '#delivery=' + token) return;
+  if (!documentData) throw new Error('This delivery link is expired or unavailable.');
+  const extensions = { 'application/pdf': 'pdf', 'image/png': 'png', 'image/jpeg': 'jpg' };
+  const extension = extensions[documentData.mime];
+  if (!extension) throw new Error('The delivery document format is unavailable.');
+  const bytes = Uint8Array.from(atob(documentData.data), char => char.charCodeAt(0));
+  const objectUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+  const link = el('a');
+  link.href = objectUrl;
+  link.download = 'globefreight-proof-of-delivery.' + extension;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+}, $('delivery-message'));
+
+function complaintReplies(record) {
+  const section = el('details', undefined, 'detail-section');
+  const history = el('ol', undefined, 'reply-history');
+  const feedback = el('p');
+  message(feedback);
+  async function loadReplies() {
+    const rows = await staffRequest('gf_complaint_replies?case_id=eq.' + record.id + '&order=created_at.desc,id.desc&limit=30');
+    history.replaceChildren();
+    for (const reply of rows) {
+      const item = el('li');
+      item.append(el('strong', reply.delivery), el('p', reply.body));
+      history.append(item);
+    }
+  }
+  section.append(el('summary', 'Email customer and view recent replies'));
+  section.append(makeActionForm(feedback, async (values) => {
+    await operation('reply', { id: record.id, message: values.get('reply').trim() });
+    section.querySelector('form').reset();
+    message(feedback, 'Reply queued for email.');
+    await loadReplies();
+  }, 'Queue email reply', field('Reply to customer', 'reply', { multiline: true, required: true, max: 2000 })));
+  section.append(feedback, button('Refresh reply history', loadReplies), history);
+  section.addEventListener('toggle', () => {
+    if (section.open) loadReplies().catch(error => message(feedback, error.message, true));
+  });
+  return section;
+}
+
+const adminQueues = [
+  { panel: 'quote-queue', list: 'quote-list', refresh: 'refresh-quotes', more: 'more-quotes', feedback: 'quotes-status',
+    table: 'gf_quotes', date: 'created_at', empty: 'No quote requests received.', render: quoteRequest },
+  { panel: 'activity-log', list: 'activity-list', refresh: 'refresh-activity', more: 'more-activity', feedback: 'activity-status',
+    table: 'gf_audit', date: 'created_at', empty: 'No activity recorded yet.', render: auditEntry }
+];
+
+function quoteRequest(record, queue) {
+  const item = el('details', undefined, 'record');
+  item.append(el('summary', record.origin + ' to ' + record.destination + ' | ' + record.status));
+  item.append(el('p', 'GFQ-' + record.id.toUpperCase() + ' | ' + record.email, 'muted'));
+  item.append(el('p', record.service + ' | ' + record.weight_kg + ' kg | ' +
+    [record.length_cm, record.width_cm, record.height_cm].join(' × ') + ' cm'));
+  item.append(makeActionForm($(queue.feedback), async (values) => {
+    const active = session;
+    const rows = await staffRequest('gf_quotes?id=eq.' + record.id +
+      '&updated_at=eq.' + encodeURIComponent(record.updated_at), {
+      method: 'PATCH', body: { status: values.get('status'), note: values.get('note').trim() }, prefer: 'return=representation'
+    });
+    if (!rows?.length) throw new Error('This quote changed. Refresh before saving.');
+    if (session !== active) return;
+    const replacement = quoteRequest(rows[0], queue);
+    replacement.open = true;
+    item.replaceWith(replacement);
+    message($(queue.feedback), 'Quote request saved.');
+  }, 'Save quote',
+  field('Status', 'status', { choices: ['New', 'In review', 'Quoted', 'Closed'], value: record.status }),
+  field('Internal note', 'note', { multiline: true, max: 2000, value: record.note })));
+  return item;
+}
+
+function auditEntry(record) {
+  const item = el('article', undefined, 'record');
+  item.append(el('strong', record.action), el('p', (record.actor_email || 'System') + ' | ' +
+    dateTime.format(new Date(record.created_at)), 'muted'), el('p', 'Record ' + record.record_id, 'muted'));
+  return item;
+}
+
+async function loadAdminQueue(queue, append = false) {
+  if (!isAdmin) return;
+  const size = 20;
+  const version = queue.version = (queue.version || 0) + 1;
+  const offset = append ? queue.offset : 0;
+  const rows = await staffRequest(queue.table + '?select=*&order=' + queue.date + '.desc,id.desc&offset=' + offset + '&limit=' + (size + 1));
+  if (queue.version !== version || !isAdmin) return;
+  const list = $(queue.list);
+  if (!append) list.replaceChildren();
+  if (!rows.length && !offset) list.append(el('p', queue.empty, 'muted'));
+  for (const row of rows.slice(0, size)) list.append(queue.render(row, queue));
+  queue.offset = offset + size;
+  $(queue.more).hidden = rows.length <= size;
+}
+
+function clearAdminOperations() {
+  $('admin-operations').hidden = true;
+  for (const queue of adminQueues) {
+    queue.version = (queue.version || 0) + 1;
+    $(queue.panel).open = false;
+    $(queue.list).replaceChildren();
+    $(queue.more).hidden = true;
+    message($(queue.feedback));
+  }
+}
+
+for (const queue of adminQueues) {
+  $(queue.panel).addEventListener('toggle', () => {
+    if (!$(queue.panel).open) return;
+    run($(queue.refresh), () => loadAdminQueue(queue), $(queue.feedback));
+  });
+  $(queue.refresh).onclick = (event) => run(event.currentTarget, () => loadAdminQueue(queue), $(queue.feedback));
+  $(queue.more).onclick = (event) => run(event.currentTarget, () => loadAdminQueue(queue, true), $(queue.feedback));
+}
 
 const trackingParam = new URLSearchParams(location.search).get('tracking');
 if (trackingParam && trackingParam.length <= 50) {
