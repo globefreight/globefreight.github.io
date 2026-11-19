@@ -5,6 +5,9 @@ const apiKey = Deno.env.get('RESEND_API_KEY');
 const from = Deno.env.get('GF_MAIL_FROM');
 const replyTo = Deno.env.get('GF_SUPPORT_EMAIL');
 const siteAddress = Deno.env.get('GF_SITE_URL');
+const digestEmail = Deno.env.get('GF_DIGEST_EMAIL');
+const digestZone = Deno.env.get('GF_DIGEST_TIMEZONE') || 'Africa/Lagos';
+const digestHour = Number(Deno.env.get('GF_DIGEST_HOUR') || '8');
 const supabaseUrl = Deno.env.get('SUPABASE_URL');
 const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ||
   JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}').default;
@@ -39,6 +42,13 @@ Deno.serve(async (request: Request) => {
     site.hash = '';
     site.search = '';
     const db = createClient(supabaseUrl, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
+    let digestError = false;
+    if (digestEmail) {
+      const { error: schedulingError } = await db.rpc('gf_queue_daily_digest', {
+        address: digestEmail, zone: digestZone, start_hour: digestHour
+      });
+      digestError = !!schedulingError;
+    }
     const { data: jobs, error } = await db.rpc('gf_claim_email');
     if (error) return Response.json({ error: 'Could not claim email jobs.' }, { status: 503 });
 
@@ -51,6 +61,11 @@ Deno.serve(async (request: Request) => {
         const tracking = new URL(site);
         tracking.searchParams.set('tracking', job.tracking_code);
         text.push('Track your shipment: ' + tracking.href);
+      }
+      if (job.action_token && (job.action_kind === 'quote' || job.action_kind === 'shipment')) {
+        const action = new URL(site);
+        action.hash = job.action_kind + '=' + job.action_token;
+        text.push((job.action_kind === 'quote' ? 'Review your quote: ' : 'Manage your shipment: ') + action.href);
       }
       if (job.case_token) {
         const complaint = new URL(site);
@@ -84,7 +99,7 @@ Deno.serve(async (request: Request) => {
       });
       if (finishError) failedToFinalize++;
     }
-    return Response.json({ processed: jobs?.length || 0, failedToFinalize }, { status: failedToFinalize ? 503 : 200 });
+    return Response.json({ processed: jobs?.length || 0, failedToFinalize, digestError }, { status: failedToFinalize || digestError ? 503 : 200 });
   } catch {
     return Response.json({ error: 'Email processing is temporarily unavailable.' }, { status: 503 });
   }

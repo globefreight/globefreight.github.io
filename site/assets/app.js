@@ -131,6 +131,8 @@ function showTracking(data) {
   header.append(el('h2', data.tracking_code), statusBadge(data.events[0]?.status));
   result.replaceChildren(header, el('p', data.origin + ' to ' + data.destination + ' · ' + data.service, 'muted'));
   if (data.eta) result.append(el('p', 'Estimated delivery ' + dateOnly.format(new Date(data.eta))));
+  if (data.pickup) result.append(el('p', 'Confirmed pickup: ' + dateTime.format(new Date(data.pickup.starts_at)) +
+    ' to ' + dateTime.format(new Date(data.pickup.ends_at))));
   result.append(el('h3', 'Tracking history'), timeline(data.events));
   result.hidden = false;
 }
@@ -217,6 +219,7 @@ function clearSession() {
   $('open-inbox').hidden = true;
   clearAdminOperations();
   resetTeamTools();
+  resetPickupQueue();
   closeComplaintInbox();
   $('logout').hidden = true;
 }
@@ -286,18 +289,20 @@ function route() {
   const portal = location.hash === '#portal';
   const delivery = location.hash.startsWith('#delivery=');
   const caseStatus = location.hash.startsWith('#case=');
+  const booking = location.hash.startsWith('#quote=') || location.hash.startsWith('#shipment=');
   const wasOnPrivatePage = $('public-page').hidden;
-  $('public-page').hidden = portal || delivery || caseStatus;
+  $('public-page').hidden = portal || delivery || caseStatus || booking;
   $('portal-page').hidden = !portal;
   $('delivery-page').hidden = !delivery;
   $('case-status-page').hidden = !caseStatus;
+  $('booking-page').hidden = !booking;
   if (delivery) message($('delivery-message'));
-  if (portal || delivery || caseStatus || (wasOnPrivatePage && !location.hash)) window.scrollTo(0, 0);
+  if (portal || delivery || caseStatus || booking || (wasOnPrivatePage && !location.hash)) window.scrollTo(0, 0);
   if (!portal && wasOnPrivatePage && !$('complaint-inbox').hidden) {
     closeComplaintInbox();
     $('open-inbox').hidden = !session;
   }
-  if (!portal && !delivery && !caseStatus && wasOnPrivatePage && location.hash) {
+  if (!portal && !delivery && !caseStatus && !booking && wasOnPrivatePage && location.hash) {
     $(location.hash.slice(1))?.scrollIntoView();
   }
 }
@@ -395,8 +400,8 @@ function makeActionForm(target, action, label, ...fields) {
 function shipmentForm(shipment) {
   const grid = el('div', undefined, 'field-grid');
   grid.append(
-    field('Origin city / region', 'origin', { required: true, max: 100, value: shipment?.origin }),
-    field('Destination city / region', 'destination', { required: true, max: 100, value: shipment?.destination }),
+    field('Origin city / region', 'origin', { required: true, max: 120, value: shipment?.origin }),
+    field('Destination city / region', 'destination', { required: true, max: 120, value: shipment?.destination }),
     field('Service', 'service', { choices: services, value: shipment?.service }),
     field('Estimated delivery', 'eta', { type: 'date', value: shipment?.eta })
   );
@@ -429,7 +434,7 @@ function updatesForm(id) {
     message($('portal-message'), 'Tracking update published.');
   }, 'Publish update',
   field('Status', 'status', { choices: statuses, value: 'In transit' }),
-  field('Public location', 'location', { max: 100 }),
+  field('Public location', 'location', { max: 120 }),
   field('Public note', 'note', { multiline: true, max: 500 }));
 }
 
@@ -551,6 +556,7 @@ async function openShipment(id) {
     history.append(el('h3', 'Tracking history'), timeline(events));
     detail.append(history);
     if (rights.admin) detail.append(recipientSection(id), accessSection(id, staff));
+    detail.append(shipmentServicesPanel(id, rights));
     if (rights.post && events[0]?.status === 'Delivered') detail.append(proofSection(id));
   } catch (error) {
     if (version !== detailVersion) return;
@@ -859,6 +865,7 @@ function quoteRequest(record, queue) {
   }, 'Save quote',
   field('Status', 'status', { choices: ['New', 'In review', 'Quoted', 'Closed'], value: record.status }),
   field('Internal note', 'note', { multiline: true, max: 2000, value: record.note })));
+  item.append(quoteBookingPanel(record.id));
   return item;
 }
 

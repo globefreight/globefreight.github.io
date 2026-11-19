@@ -23,6 +23,7 @@
   <script defer src="assets/qrcode-generator.js"></script>
   <script defer src="assets/app.js"></script>
   <script defer src="assets/team-tools.js"></script>
+  <script defer src="assets/booking.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -174,6 +175,13 @@
       </div>
     </section>
   </div>
+  <section id="booking-page" class="shell portal" aria-labelledby="booking-title" hidden>
+    <div class="card booking-card">
+      <h1 id="booking-title">Shipment services</h1>
+      <p id="booking-message" role="status" hidden></p>
+      <div id="booking-content"></div>
+    </div>
+  </section>
   <section id="case-status-page" class="shell portal" aria-labelledby="case-status-title" hidden>
     <div class="card">
       <h1 id="case-status-title">Complaint status</h1>
@@ -226,6 +234,15 @@
         <button id="more-complaints" class="secondary" type="button" hidden>Load more complaints</button>
       </section>
       <div id="shipment-workspace">
+        <details class="card team-tool" id="pickup-queue">
+          <summary>Pickup requests</summary>
+          <div class="actions">
+            <button id="refresh-pickups" class="secondary" type="button">Refresh pickups</button>
+            <button id="more-pickups" class="secondary" type="button" hidden>Load more</button>
+          </div>
+          <p id="pickups-message" role="status" hidden></p>
+          <div id="pickup-list"></div>
+        </details>
         <details class="card team-tool" id="exception-queue">
           <summary>Delivery exception queue</summary>
           <p class="muted">Reported exceptions, shipments past their estimated delivery date, and shipments with no update for 48 hours.</p>
