@@ -11,7 +11,7 @@ button:disabled{opacity:.6;cursor:wait}
 :focus-visible{outline:3px solid #168a9a;outline-offset:3px}
 .shell{width:min(1160px,calc(100% - 3rem));margin-inline:auto}
 .header{background:var(--deep);color:#fff}
-.header-inner,.footer-inner{display:flex;align-items:center;justify-content:space-between;min-height:76px;gap:1rem}
+.header-inner{display:flex;align-items:center;justify-content:space-between;min-height:76px;gap:1rem}
 .brand{display:inline-flex;align-items:center;gap:.7rem;font-family:"Space Grotesk",system-ui,sans-serif;font-size:1.24rem;font-weight:700;line-height:1.05;letter-spacing:-.04em}
 .brand small{display:block;font-family:Manrope,system-ui,sans-serif;font-size:.72rem;letter-spacing:.21em;margin-top:5px;color:var(--accent)}
 .brand-mark{background:var(--accent);color:var(--deep);border-radius:10px;width:42px;height:42px;display:grid;place-items:center;font-size:1.9rem;line-height:1}
@@ -40,7 +40,6 @@ label input:not([type=checkbox]),label select,label textarea{margin-top:.35rem}
 .milestones p,.muted{color:var(--muted)}
 .milestones p{margin:.3rem 0 0}
 footer{background:var(--deep);color:#c8d9dd}
-.footer-inner{min-height:100px}
 .results{margin-top:1rem;max-width:900px}
 .result-header,.portal-heading,.section-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 .badge{display:inline-block;border-radius:7px;padding:.25rem .55rem;background:#e6f3ec;color:#075845;font-weight:800;font-size:.875rem}
@@ -77,8 +76,8 @@ footer{background:var(--deep);color:#c8d9dd}
 .status-message{border-radius:8px;background:#e3f2ee;padding:.75rem 1rem;color:#134d41}
 .status-message.error{background:#fdebec;color:#8b282c}
 code{overflow-wrap:anywhere}
-@media(max-width:720px){.workspace-grid,.milestones{grid-template-columns:1fr}.milestones{gap:0}.footer-inner>span{display:none}}
-@media(max-width:480px){.shell{width:calc(100% - 1.6rem)}nav{gap:.45rem;font-size:.875rem}nav a:first-child{display:none}.input-row,.field-grid{display:grid;grid-template-columns:1fr}.tracking-heading{align-items:flex-start}}
+@media(max-width:720px){.workspace-grid,.milestones{grid-template-columns:1fr}.milestones{gap:0}}
+@media(max-width:480px){.shell{width:calc(100% - 1.6rem)}nav{gap:.45rem;font-size:.875rem}.input-row,.field-grid{display:grid;grid-template-columns:1fr}.tracking-heading{align-items:flex-start}}
 
 .staff-create{margin-bottom:1rem}
 .staff-create summary{cursor:pointer;font-weight:800;font-size:1.125rem}
@@ -143,16 +142,8 @@ code{overflow-wrap:anywhere}
 .faq-list details{background:#fff;border:1px solid #d6e5df;border-radius:10px;padding:.85rem 1rem}
 .faq-list summary{cursor:pointer;font-weight:800}
 .faq-list p{margin:.65rem 0 0;color:var(--muted)}
-.site-footer{padding-top:2.5rem}
-.footer-grid{display:grid;grid-template-columns:minmax(180px,1fr) minmax(0,1.5fr);gap:2rem;padding-bottom:2rem}
-.footer-brand .brand{color:#fff}
-.footer-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:1.3rem;font-size:.9375rem}
-.footer-nav h2{color:#fff;font-size:1.05rem;margin-bottom:.7rem}
-.footer-nav a{display:block;width:fit-content;margin-top:.45rem}
-.footer-bottom{border-top:1px solid #263e51;display:flex;justify-content:space-between;gap:.8rem;padding-block:1rem;font-size:.875rem}
-.footer-bottom a:hover{text-decoration:underline}
 @media(max-width:780px){.header-inner{flex-wrap:wrap;gap:.85rem;padding-block:.85rem}.main-nav{flex-wrap:wrap}.home-milestones .milestones{grid-template-columns:1fr}.help-grid{grid-template-columns:1fr}}
-@media(max-width:480px){.main-nav a:first-child{display:inline}.main-nav{gap:.45rem .8rem}.main-nav .portal-link{padding:.35rem .55rem}.footer-grid{grid-template-columns:1fr;gap:1.1rem}}
+@media(max-width:480px){.main-nav a:first-child{display:inline}.main-nav{gap:.45rem .8rem}.main-nav .portal-link{padding:.35rem .55rem}}
 .company-panel{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;border-radius:18px;padding:clamp(1.3rem,4vw,2.5rem);background:linear-gradient(114deg,#0a1b2c,#10574e);color:#fff}
 .company-panel .eyebrow{color:var(--accent)}
 .company-panel p:last-child{max-width:64ch;margin:.85rem 0 0;color:#e0eeed}
@@ -165,7 +156,6 @@ code{overflow-wrap:anywhere}
 .contact-section h2{font-size:clamp(1.9rem,4.5vw,2.65rem)}
 .contact-section h3{font-size:1.45rem}
 .form-guidance{margin:0;font-size:.9rem}
-.footer-nav{grid-template-columns:repeat(3,minmax(0,1fr))}
 .portal-actions .portal-inbox-button{background:#193748;color:#fff;border-color:#598078}
 .inbox-panel .section-header{border-bottom:1px solid var(--line);padding-bottom:1rem}
 .inbox-panel .section-header p,.inbox-panel .actions{margin:.45rem 0 0}
@@ -174,8 +164,8 @@ code{overflow-wrap:anywhere}
 .complaint-record summary .badge{margin-left:.5rem}
 .complaint-record .case-description{white-space:pre-wrap}
 .complaint-record .detail-section{margin-top:1rem;padding-top:.85rem}
-@media(max-width:780px){.contact-section{grid-template-columns:1fr}.location-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr;gap:1.25rem}}
-@media(max-width:500px){.company-panel{flex-direction:column;align-items:flex-start}.footer-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.main-nav{gap:.4rem .7rem}}
+@media(max-width:780px){.contact-section{grid-template-columns:1fr}.location-grid{grid-template-columns:1fr}}
+@media(max-width:500px){.company-panel{flex-direction:column;align-items:flex-start}.main-nav{gap:.4rem .7rem}}
 .badge[data-status="Open"]{background:#fff1db;color:#754817}
 .badge[data-status="In review"]{background:#e4effa;color:#204e78}
 .badge[data-status="Resolved"]{background:#dcf5e4;color:#155630}
@@ -263,8 +253,6 @@ code{overflow-wrap:anywhere}
 .reading-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-block:1.4rem}
 .reading-grid article{border-left:3px solid #7bb797;background:#edf4f4;padding:1.1rem}
 .reading-grid p{margin:.4rem 0 0}
-.footer-brand p{max-width:28ch;color:#abc1c3;margin:1rem 0 0}
-.footer-nav a[aria-current=page]{color:var(--accent)}
 /* Role-aware dashboard */
 .dashboard-shell{display:grid;grid-template-columns:205px minmax(0,1fr);align-items:start;gap:1rem}
 .dashboard-main{min-width:0}
@@ -395,13 +383,6 @@ code{overflow-wrap:anywhere}
   .dashboard-next>div{grid-template-columns:1fr;gap:.42rem;margin-top:.65rem}
   .dashboard-shortcut{gap:.15rem;padding:.65rem .73rem}
   .dashboard-shortcut span{font-size:.83rem}
-  .site-footer{padding-top:1.35rem}
-  .footer-grid{gap:.9rem;padding-bottom:1.15rem}
-  .footer-brand p{margin-top:.55rem;max-width:38ch;font-size:.9rem}
-  .footer-nav{gap:.85rem .6rem}
-  .footer-nav h2{margin-bottom:.3rem}
-  .footer-nav a{margin-top:0;padding:.31rem 0;line-height:1.29}
-  .footer-bottom{padding-block:.69rem}
 }
 @media(max-width:620px){
   html{scroll-padding-top:4.4rem}
@@ -425,4 +406,20 @@ code{overflow-wrap:anywhere}
   .home-hero-description{margin-top:.76rem}
   .home-hero-photo{width:100%;padding:.29rem;border-radius:11px}
   .home-hero-photo img{height:clamp(112px,32vw,154px);border-radius:7px}
+}
+
+/* A short set of useful links, with the full site menu in the header. */
+.site-footer{background:var(--deep);color:#c8d9e3}
+.footer-main{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.1rem 2rem;padding-block:1.55rem}
+.footer-main .brand{color:#fff}
+.footer-nav{display:flex;align-items:center;flex-wrap:wrap;gap:.3rem clamp(.85rem,2vw,1.6rem);font-weight:600;font-size:.9rem}
+.footer-nav a{display:flex;align-items:center;min-height:44px}
+.footer-nav a[aria-current=page]{color:var(--accent)}
+.footer-bottom{border-top:1px solid #2a4256;display:flex;justify-content:space-between;align-items:center;gap:.65rem;padding-block:.7rem;font-size:.84rem}
+.footer-bottom a{padding:.25rem 0}
+.footer-bottom a:hover{text-decoration:underline}
+@media(max-width:620px){
+  .footer-main{display:grid;grid-template-columns:minmax(0,1fr);justify-content:stretch;gap:.75rem;padding-block:1.2rem .8rem}
+  .footer-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:1rem;row-gap:0;width:100%}
+  .footer-nav a{line-height:1.25}
 }
