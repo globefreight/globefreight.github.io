@@ -253,6 +253,7 @@ code{overflow-wrap:anywhere}
 .feature-layout h3{margin-top:1.3rem}
 .feature-layout p,.editorial-list,.reading-grid p{color:var(--muted)}
 .feature-photo{display:block;width:100%;height:clamp(240px,33vw,390px);object-fit:cover;border-radius:16px;background:#cde0db}
+.feature-photo.about-delivery-photo{height:auto}
 .editorial-list{padding-left:1.25rem}
 .editorial-list li{padding:.29rem 0}
 .reading-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-block:1.4rem}
