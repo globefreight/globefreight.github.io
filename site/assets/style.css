@@ -440,3 +440,11 @@ code{overflow-wrap:anywhere}
 .address-option:hover,.address-option:focus-visible{background:#e6f5f1}
 @media(max-width:1080px){.shipment-address-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.shipment-address .field-grid{grid-template-columns:1fr}}
+#tracking-result{min-width:0;overflow-wrap:anywhere}
+#tracking-result .result-header h2{min-width:0;max-width:100%}
+#tracking-result .badge{max-width:100%}
+@media(max-width:620px){
+  #tracking-result .result-header{display:grid;grid-template-columns:minmax(0,1fr);justify-items:start;gap:.55rem;padding-bottom:.7rem;border-bottom:1px solid var(--line)}
+  #tracking-result .result-header h2{font:700 clamp(.87rem,3.45vw,1.08rem)/1.4 ui-monospace,monospace;letter-spacing:0}
+  #tracking-result .timeline li{padding-left:.83rem}
+}
