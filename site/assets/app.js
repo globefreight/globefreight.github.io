@@ -432,35 +432,6 @@ function makeActionForm(target, action, label, ...fields) {
   return form;
 }
 
-function shipmentForm(shipment) {
-  const grid = el('div', undefined, 'field-grid');
-  grid.append(
-    field('Origin city / region', 'origin', { required: true, max: 120, value: shipment?.origin }),
-    field('Destination city / region', 'destination', { required: true, max: 120, value: shipment?.destination }),
-    field('Service', 'service', { choices: services, value: shipment?.service }),
-    field('Estimated delivery', 'eta', { type: 'date', value: shipment?.eta })
-  );
-  return makeForm(async (values) => {
-    const body = Object.fromEntries(values);
-    body.origin = body.origin.trim();
-    body.destination = body.destination.trim();
-    body.eta = body.eta || null;
-    const id = shipment?.id;
-    const rows = await staffRequest('pf_shipments' + (id ? '?id=eq.' + id : ''), {
-      method: id ? 'PATCH' : 'POST', body, prefer: 'return=representation'
-    });
-    if (!rows?.length) throw new Error('The shipment could not be saved. Refresh your permissions and try again.');
-    if (!session || currentShipment !== (id || null)) return;
-    if (!id) {
-      shipmentQuery = '';
-      $('shipment-search').reset();
-    }
-    await Promise.all([openShipment(rows[0].id), loadList(), loadMetrics()]);
-    message($('portal-message'), id ? 'Shipment details saved.' : 'Shipment created.');
-  }, shipment ? 'Save details' : 'Create shipment', grid,
-  field('Internal reference', 'internal_reference', { max: 150, value: shipment?.internal_reference }));
-}
-
 function updatesForm(id) {
   return makeForm(async (values) => {
     await staffRequest('pf_events', { method: 'POST', body: { shipment_id: id, ...Object.fromEntries(values) } });
@@ -574,6 +545,7 @@ async function openShipment(id) {
     const facts = [shipment.service, shipment.eta && 'Estimated delivery ' + dateOnly.format(new Date(shipment.eta)),
       shipment.internal_reference && 'Internal reference ' + shipment.internal_reference].filter(Boolean);
     detail.append(el('p', facts.join(' · ')));
+    if (!rights.edit) detail.append(readOnlyShipmentAddresses(id));
     if (rights.edit) {
       const section = el('section', undefined, 'detail-section');
       section.append(el('h3', 'Shipment details'), shipmentForm(shipment));

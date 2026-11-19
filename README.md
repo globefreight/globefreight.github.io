@@ -87,6 +87,15 @@ Test with addresses you control before opening the form to customers. The queue 
 3. **Suspend staff access** blocks that account from the GlobeFreight dashboard, removes shipment permissions, and returns its complaints and delivery exceptions to the admin queue. **Reinstate staff access** allows the user to sign in and receive fresh assignments.
 4. **Customer service** gives administrators a shipment lookup and links to complaints and quotes. Use the shipment record to manage recipient email, private shipment links, pickup, and delivery documents. Use **Find a complaint** in the inbox to open an older case by its GF reference.
 
+## Enable country, region, and address entry
+
+1. Run [the shipment addresses migration](supabase/migrations/20261119000600_globefreight_addresses.sql) in Supabase SQL Editor after the earlier migrations. Country and region choices and manual address entry work after installing this migration and publishing the site.
+2. To enable address suggestions, set `GEOAPIFY_API_KEY` in **Supabase → Edge Functions → Secrets**. Deploy an Edge Function named `address-autocomplete` using [its index.ts file](supabase/functions/address-autocomplete/index.ts). Turn off **Verify JWT with legacy secret** for this function. The code verifies the signed-in user's current shipment rights before calling Geoapify.
+3. In the Team Portal choose **New shipment**. Enter pickup and delivery countries, regions, cities, and street addresses. Suggestions appear after four characters. If no suggestion matches, finish typing the address manually. Apartment and unit details are entered separately.
+4. Street addresses and postal codes are visible inside the authorized team portal. Public tracking shows the location summaries only. The Geoapify lookup receives the typed street query and selected country and region when suggestions are requested. Keep the API key server-side.
+
+Country and region data from [country-region-data 4.1.0](https://github.com/country-regions/country-region-data), available under the MIT license.
+
 ## Deploy staff account creation in Supabase
 
 In **Edge Functions**, choose **Deploy a new function → Via Editor**. Name it `create-staff` and replace the editor contents with [the included function](supabase/functions/create-staff/index.ts), then deploy it. In the function's **Details** tab, turn off **Verify JWT with legacy secret**. The handler verifies the Supabase Auth session itself and checks the live administrator role before creating an account. It uses Supabase's built-in server-side credentials. No Node.js or PowerShell is needed.
