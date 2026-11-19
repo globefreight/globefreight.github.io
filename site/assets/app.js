@@ -122,28 +122,18 @@ function timeline(events) {
   return list;
 }
 
-const sample = {
-  tracking_code: 'PF-DEMO-001', origin: 'Lagos, NG', destination: 'Accra, GH', service: 'Road Freight',
-  events: [
-    { status: 'In transit', location: 'Lagos, NG', note: 'Shipment departed the origin facility.', posted_at: '2026-10-15T11:30:00Z' },
-    { status: 'Picked up', location: 'Lagos, NG', posted_at: '2026-10-15T08:10:00Z' },
-    { status: 'Label created', location: 'Lagos, NG', posted_at: '2026-10-14T15:05:00Z' }
-  ]
-};
-
 function showTracking(data) {
   const result = $('tracking-result');
   const header = el('div', undefined, 'result-header');
   header.append(el('h2', data.tracking_code), statusBadge(data.events[0]?.status));
   result.replaceChildren(header, el('p', data.origin + ' to ' + data.destination + ' Â· ' + data.service, 'muted'));
-  if (data === sample) result.append(el('p', 'Sample shipment with illustrative tracking updates.', 'muted'));
   if (data.eta) result.append(el('p', 'Estimated delivery ' + dateOnly.format(new Date(data.eta))));
   result.append(el('h3', 'Tracking history'), timeline(data.events));
   result.hidden = false;
 }
 
 async function track(code, version, background = false) {
-  const data = code === sample.tracking_code ? sample : await rpc('pf_track', { code }, false);
+  const data = await rpc('pf_track', { code }, false);
   if (version !== trackingVersion) return;
   if (!data) {
     $('tracking-result').hidden = true;
@@ -157,7 +147,7 @@ async function track(code, version, background = false) {
     showTracking(data);
     result.dataset.signature = signature;
   }
-  if (!background && data !== sample) {
+  if (!background) {
     trackTimer = setInterval(() => {
       if (!document.hidden && location.hash !== '#portal') {
         track(code, version, true).catch(() => {
@@ -172,14 +162,10 @@ bind($('track-form'), async (values) => {
   clearInterval(trackTimer);
   $('tracking-result').hidden = true;
   const code = values.get('code').trim().toUpperCase();
+  const version = ++trackingVersion;
   if (!code) throw new Error('Enter a tracking number.');
-  await track(code, ++trackingVersion);
+  await track(code, version);
 }, $('track-message'));
-
-$('sample').addEventListener('click', () => {
-  $('tracking-code').value = sample.tracking_code;
-  $('track-form').requestSubmit();
-});
 
 function chooseMode(mode) {
   loginMode = mode;
@@ -278,9 +264,13 @@ $('logout').onclick = async () => {
 
 function route() {
   const portal = location.hash === '#portal';
+  const wasInPortal = $('public-page').hidden;
   $('public-page').hidden = portal;
   $('portal-page').hidden = !portal;
-  if (portal) window.scrollTo(0, 0);
+  if (portal || (wasInPortal && !location.hash)) window.scrollTo(0, 0);
+  if (!portal && wasInPortal && location.hash) {
+    $(location.hash.slice(1))?.scrollIntoView();
+  }
 }
 window.addEventListener('hashchange', route);
 route();

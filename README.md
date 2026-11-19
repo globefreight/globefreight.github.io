@@ -29,7 +29,7 @@ Sign in as administrator and open **Create staff login**. Enter the staff email 
 2. In the repository, go to **Settings → Pages** and select **GitHub Actions** as the source.
 3. Run **Deploy GlobeFreight Express** from the **Actions** tab if the initial push did not deploy. The workflow publishes only the `site/` directory and displays the resulting URL. The migration is applied separately in Supabase.
 
-To preview locally, run `python -m http.server 8000 --directory site` from this folder and visit `http://localhost:8000`. Use **Try a sample shipment** for a demonstration without a database. The sample is labeled and separate from customer records.
+To preview locally, run `python -m http.server 8000 --directory site` from this folder and visit `http://localhost:8000`. Public tracking requires an existing shipment in Supabase.
 
 ## Verify the live setup
 

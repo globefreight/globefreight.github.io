@@ -126,3 +126,34 @@ code{overflow-wrap:anywhere}
 
 .brand-mark{object-fit:contain;background:transparent}
 .icon-box svg,.milestone-icon svg,.metric-icon svg{display:block;width:23px;height:23px}
+/* Public homepage navigation and help */
+.skip-link{position:absolute;z-index:2;top:.6rem;left:.6rem;transform:translateY(-180%);padding:.65rem .9rem;border-radius:7px;background:var(--lime);color:var(--deep);font-weight:800}
+.skip-link:focus{transform:none}
+.header-inner{gap:1.5rem}
+.main-nav{gap:clamp(.8rem,2vw,1.6rem)}
+.main-nav a{white-space:nowrap}
+.main-nav .portal-link{color:var(--lime);border-color:#56736c}
+.tracking-area{padding-bottom:0}
+.tracking-help-link{display:inline-block;margin-top:.75rem}
+.home-milestones{padding-block:clamp(2.4rem,6vw,4.4rem)}
+.home-milestones h2,.home-help h2{font-size:clamp(1.9rem,4.5vw,2.65rem)}
+.section-intro{color:var(--muted);margin:.65rem 0 0}
+.home-milestones .milestones{gap:1rem;margin-top:1.4rem}
+.home-milestones article{background:#fff;border:1px solid var(--line);border-radius:13px;padding:1rem;min-width:0}
+.home-milestones h3{font-size:1.2rem}
+.home-help{background:#e9f2ef;border-block:1px solid #d6e6df;padding-block:clamp(2rem,5vw,3.8rem)}
+.help-grid{display:grid;grid-template-columns:minmax(210px,1fr) minmax(0,1.7fr);gap:clamp(1rem,4vw,3rem)}
+.faq-list{display:grid;gap:.55rem}
+.faq-list details{background:#fff;border:1px solid #d6e5df;border-radius:10px;padding:.85rem 1rem}
+.faq-list summary{cursor:pointer;font-weight:800}
+.faq-list p{margin:.65rem 0 0;color:var(--muted)}
+.site-footer{padding-top:2.5rem}
+.footer-grid{display:grid;grid-template-columns:minmax(180px,1fr) minmax(0,1.5fr);gap:2rem;padding-bottom:2rem}
+.footer-brand .brand{color:#fff}
+.footer-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:1.3rem;font-size:.9375rem}
+.footer-nav h2{color:#fff;font-size:1.05rem;margin-bottom:.7rem}
+.footer-nav a{display:block;width:fit-content;margin-top:.45rem}
+.footer-bottom{border-top:1px solid #29424b;display:flex;justify-content:space-between;gap:.8rem;padding-block:1rem;font-size:.875rem}
+.footer-bottom a:hover{text-decoration:underline}
+@media(max-width:780px){.header-inner{flex-wrap:wrap;gap:.85rem;padding-block:.85rem}.main-nav{flex-wrap:wrap}.home-milestones .milestones{grid-template-columns:1fr}.help-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.main-nav a:first-child{display:inline}.main-nav{gap:.45rem .8rem}.main-nav .portal-link{padding:.35rem .55rem}.footer-grid{grid-template-columns:1fr;gap:1.1rem}}

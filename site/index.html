@@ -22,16 +22,19 @@
   <script defer src="assets/app.js"></script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="header">
   <div class="shell header-inner">
     <a class="brand" href="#" aria-label="GlobeFreight Express home"><img class="brand-mark" src="assets/globe-mark.svg?v=2" alt="" width="42" height="42"><span>GlobeFreight <small>EXPRESS</small></span></a>
-    <nav aria-label="Main navigation">
+    <nav class="main-nav" aria-label="Main navigation">
       <a href="#tracking">Track a shipment</a>
+      <a href="#milestones">Shipment milestones</a>
+      <a href="#tracking-help">Tracking help</a>
       <a class="portal-link" href="#portal">Team portal</a>
     </nav>
   </div>
 </header>
-<main>
+<main id="main">
   <div id="public-page">
     <section class="hero">
       <div class="shell hero-inner">
@@ -54,13 +57,43 @@
           </div>
         </form>
         <p id="track-message" role="status" hidden></p>
-        <button type="button" class="text-button" id="sample">Try a sample shipment</button>
+        <a class="text-button tracking-help-link" href="#tracking-help">Need help finding your tracking number?</a>
       </div>
       <section class="card results" id="tracking-result" aria-label="Shipment results" aria-live="polite" hidden></section>
-      <div class="milestones" aria-label="Shipment milestones">
-        <article><span class="milestone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 9L4 7.5M12 12l8-4.5M12 12v9"/></svg></span><div><h3>Dispatch</h3><p>See when your freight is picked up.</p></div></article>
-        <article><span class="milestone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6h9a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h9"/></svg></span><div><h3>In transit</h3><p>Follow recorded movement and exceptions.</p></div></article>
-        <article><span class="milestone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><div><h3>Delivery</h3><p>Check the latest delivery milestone.</p></div></article>
+    </section>
+    <section class="shell home-milestones" id="milestones" aria-labelledby="milestones-title">
+      <h2 id="milestones-title">From pickup to delivery</h2>
+      <p class="section-intro">Read the latest status to see where your shipment is in its journey.</p>
+      <div class="milestones">
+        <article><span class="milestone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 9L4 7.5M12 12l8-4.5M12 12v9"/></svg></span><div><h3>Dispatch</h3><p>A pickup update confirms your freight has been collected.</p></div></article>
+        <article><span class="milestone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6h9a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h9"/></svg></span><div><h3>In transit</h3><p>Follow progress between facilities and look for customs or exception updates when posted.</p></div></article>
+        <article><span class="milestone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><div><h3>Delivery</h3><p>Check when your freight is out for delivery and when delivery is recorded.</p></div></article>
+      </div>
+    </section>
+    <section class="home-help" id="tracking-help" aria-labelledby="help-title">
+      <div class="shell help-grid">
+        <div>
+          <h2 id="help-title">Tracking help</h2>
+          <a class="text-button tracking-help-link" href="#tracking">Back to shipment tracking</a>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>Where is my tracking number?</summary>
+            <p>Look in your shipment confirmation or open the tracking link sent to you. If you received neither, ask the sender for the tracking number.</p>
+          </details>
+          <details>
+            <summary>Why can’t I find my shipment?</summary>
+            <p>Check the number against your confirmation and remove any spaces inside it. If the number still returns no result, ask the sender to verify it and confirm the shipment record is ready.</p>
+          </details>
+          <details>
+            <summary>What does “Label created” mean?</summary>
+            <p>A shipment record has been created. Look for a separate pickup event to confirm that your freight has been collected.</p>
+          </details>
+          <details>
+            <summary>What does “Exception” mean?</summary>
+            <p>An issue was recorded during transit or delivery. Check the latest update for details and contact the sender if you need help.</p>
+          </details>
+        </div>
       </div>
     </section>
   </div>
@@ -122,7 +155,20 @@
     </div>
   </section>
 </main>
-<footer><div class="shell footer-inner"><a class="brand" href="#"><img class="brand-mark" src="assets/globe-mark.svg?v=2" alt="" width="42" height="42"><span>GlobeFreight <small>EXPRESS</small></span></a><span>Shipment tracking &amp; logistics</span></div></footer>
+<footer class="site-footer">
+  <div class="shell">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="#" aria-label="GlobeFreight Express home"><img class="brand-mark" src="assets/globe-mark.svg?v=2" alt="" width="42" height="42"><span>GlobeFreight <small>EXPRESS</small></span></a>
+      </div>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <div><h2>Shipments</h2><a href="#tracking">Track a shipment</a><a href="#milestones">Shipment milestones</a><a href="#tracking-help">Tracking help</a></div>
+        <div><h2>Team access</h2><a href="#portal">Admin and staff portal</a></div>
+      </nav>
+    </div>
+    <div class="footer-bottom"><small>&copy; GlobeFreight Express</small><a href="#">Back to top</a></div>
+  </div>
+</footer>
 </body>
 </html>
 
