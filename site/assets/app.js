@@ -227,6 +227,8 @@ function clearSession() {
   $('signin-layout').hidden = false;
   $('workspace').hidden = true;
   for (const item of document.querySelectorAll('[data-admin-tool]')) item.hidden = true;
+  $('dashboard-mobile').hidden = true;
+  $('workspace-picker').replaceChildren();
   $('open-inbox').hidden = true;
   clearAdminOperations();
   resetTeamTools();
@@ -259,6 +261,10 @@ bind($('signin-form'), async (values) => {
   $('signin-layout').hidden = true;
   $('workspace').hidden = false;
   for (const item of document.querySelectorAll('[data-admin-tool]')) item.hidden = !isAdmin;
+  const picker = $('workspace-picker');
+  picker.replaceChildren(...Array.from(document.querySelectorAll('[data-dashboard-tab]:not([hidden])'), item =>
+    new Option(item.textContent.trim(), item.dataset.dashboardTab)));
+  $('dashboard-mobile').hidden = false;
   showDashboardView('overview');
   $('logout').hidden = false;
   $('open-inbox').hidden = false;
@@ -717,7 +723,9 @@ $('open-inbox').onclick = (event) => run(event.currentTarget, async () => {
 
 $('close-inbox').onclick = () => {
   showDashboardView('shipments');
-  document.querySelector('[data-dashboard-tab="shipments"]')?.focus();
+  const picker = $('workspace-picker');
+  if (picker.getClientRects().length) picker.focus();
+  else document.querySelector('[data-dashboard-tab="shipments"]')?.focus();
 };
 
 bind($('case-lookup'), async (values) => {
@@ -953,6 +961,7 @@ for (const queue of adminQueues) {
 }
 
 function highlightDashboard(view) {
+  $('workspace-picker').value = view;
   for (const button of document.querySelectorAll('[data-dashboard-tab]')) {
     if (button.dataset.dashboardTab === view) button.setAttribute('aria-current', 'page');
     else button.removeAttribute('aria-current');
@@ -976,6 +985,7 @@ function showDashboardView(view) {
   }
 }
 
+$('workspace-picker').addEventListener('change', event => showDashboardView(event.currentTarget.value));
 for (const button of document.querySelectorAll('[data-dashboard-tab],[data-dashboard-open]')) {
   button.addEventListener('click', () => {
     showDashboardView(button.dataset.dashboardTab || button.dataset.dashboardOpen);

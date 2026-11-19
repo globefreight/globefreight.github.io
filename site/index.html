@@ -57,7 +57,7 @@
     <section class="hero home-hero" data-public-view="home">
       <div class="shell hero-inner">
         <p class="eyebrow"><span></span> GLOBEFREIGHT EXPRESS</p>
-        <h1>Freight in motion.<br><em>Clarity at every step.</em></h1>
+        <h1><span class="desktop-hero-title">Freight in motion.<br><em>Clarity at every step.</em></span><span class="mobile-hero-title">Track your freight.<br><em>Plan your next move.</em></span></h1>
         <p>Plan your shipment, follow recorded milestones, and get help when delivery plans change.</p>
         <div class="hero-actions"><a class="section-cta" href="#tracking">Track a shipment</a><a class="hero-secondary" href="#quote">Request a quote</a></div>
       </div>
@@ -274,6 +274,10 @@
       </aside>
     </div>
     <div id="workspace" class="dashboard-shell" hidden>
+      <div class="dashboard-mobile card" id="dashboard-mobile" hidden>
+        <label for="workspace-picker">Workspace</label>
+        <select id="workspace-picker"></select>
+      </div>
       <nav class="dashboard-rail card" aria-label="Dashboard navigation">
         <p class="dashboard-rail-title">Workspace</p>
         <button type="button" class="secondary" data-dashboard-tab="overview" aria-current="page">Overview</button>

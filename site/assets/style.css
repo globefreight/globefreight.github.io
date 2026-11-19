@@ -340,3 +340,87 @@ code{overflow-wrap:anywhere}
   .header.nav-ready .main-nav .portal-link{border-color:#526d83;margin-top:.2rem}
   .main-nav .mobile-help-link{display:inline-flex}
 }
+/* Phone layouts keep the next action close to the top of the screen. */
+.mobile-hero-title,.dashboard-mobile{display:none}
+@media(max-width:800px){
+  .dashboard-shell{gap:.85rem}
+  .dashboard-mobile{display:grid;grid-template-columns:max-content minmax(0,1fr);align-items:center;gap:.85rem;padding:.6rem .8rem}
+  .dashboard-mobile label{color:var(--muted);font-size:.875rem}
+  .dashboard-mobile + .dashboard-rail{display:none}
+  .dashboard-mobile[hidden] + .dashboard-rail{display:grid}
+  .dashboard-mobile select{min-width:0;min-height:44px;font-weight:800;border-color:#c2d5e2;background-color:#f7fafc}
+}
+@media(max-width:620px){
+  .shell{width:calc(100% - 2rem)}
+  .header.nav-ready{position:sticky;top:0}
+  .header.nav-ready .header-inner{min-height:62px;padding-block:.5rem}
+  .header.nav-ready .menu-toggle{background:transparent;min-width:76px;border-color:#4c6275}
+  .header.nav-ready .main-nav{top:calc(100% + .37rem);left:.65rem;right:.65rem;max-height:calc(100dvh - 80px);padding:.5rem;border:1px solid #34536a;border-radius:13px;box-shadow:0 18px 34px #071424a3}
+  .header.nav-ready .main-nav a{padding-inline:.8rem}
+  .desktop-hero-title{display:none}
+  .mobile-hero-title{display:inline}
+  .home-hero{min-height:0;background-image:linear-gradient(180deg,#0b2137 0%,#0b2137eb 45%,#0a1b2c85 81%,#0a1b2c45),url('freight-ocean.jpg');background-position:center,62% 53%}
+  .home-hero .hero-inner{padding-block:2.15rem 2.9rem}
+  .home-hero .eyebrow,.page-mast .eyebrow,.portal .eyebrow{font-size:.78rem;letter-spacing:.12em;margin-bottom:.8rem}
+  .home-hero h1{font-size:clamp(1.92rem,8.3vw,2.7rem);letter-spacing:-.04em;line-height:1.08}
+  .home-hero .hero-inner>p:not(.eyebrow){font-size:1rem;margin-top:.9rem;max-width:33ch}
+  .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.52rem;margin-top:1.25rem}
+  .hero-actions a{display:grid;place-items:center;text-align:center;padding:.56rem .35rem;min-height:46px;font-size:.875rem;line-height:1.2}
+  .home-pathways{margin-top:-.8rem;gap:.55rem}
+  .pathway{border-top:1px solid var(--line);border-left:3px solid #77ada7;padding:.9rem 1rem;border-radius:10px}
+  .pathway h2{font-size:1.18rem}
+  .pathway p{margin:.33rem 0 .44rem;font-size:.94rem;line-height:1.47}
+  .pathway a{font-size:.9rem;min-height:34px;display:flex;align-items:center}
+  .editorial-band{gap:.6rem;padding-block:1.8rem 2.1rem}
+  .editorial-band h2,.feature-layout h2{font-size:1.75rem}
+  .editorial-band p:not(.eyebrow){margin-bottom:.4rem}
+  .page-mast>.shell{padding-block:1.65rem 1.9rem}
+  .page-mast h1{font-size:clamp(1.95rem,8.2vw,2.7rem)}
+  .page-mast p:last-child{margin-top:.7rem;font-size:1rem}
+  .page-tracking,.contact-section,.home-milestones,.home-help,.feature-layout{padding-block:1.25rem 1.7rem}
+  .contact-section>div>h2,.home-milestones h2,.home-help h2{font-size:1.55rem}
+  .contact-section .editorial-list{margin:.55rem 0 0}
+  .contact-section p{margin-block:.5rem}
+  .contact-section .card,.page-tracking .card,.signin-layout .card{padding:.95rem;border-radius:12px}
+  .tracking-heading{gap:.7rem;margin-bottom:1rem}
+  .tracking-heading .icon-box{width:39px;height:39px}
+  .tracking-heading h2{font-size:1.37rem}
+  .tracking-heading p{font-size:.93rem}
+  .feature-photo{height:210px;border-radius:12px}
+  .location-grid{gap:.55rem}
+  .location-card{padding:.85rem .95rem}
+  #quote-form .field-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+  #quote-form .field-grid label:nth-child(-n+4){grid-column:1/-1}
+  #quote-form input,#quote-form select{min-width:0}
+  .portal{padding-block:1rem 1.65rem}
+  .portal-heading{padding:1rem 1rem 1.1rem;min-height:0;border-radius:13px;margin-bottom:.8rem}
+  .portal h1{font-size:clamp(1.63rem,7.5vw,2.24rem);line-height:1.1}
+  .portal-identity{font-size:.88rem;margin-top:.42rem}
+  .portal-actions{gap:.35rem;width:100%}
+  .portal-actions button{font-size:.81rem;min-height:42px;padding:.5rem .55rem}
+  .portal #open-inbox{display:none}
+  .dashboard-intro{margin:.15rem 0 .7rem}
+  .dashboard-intro h2{font-size:1.34rem}
+  .dashboard-intro p{font-size:.91rem}
+  .dashboard-metrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:.37rem;margin-bottom:.65rem}
+  .dashboard-metrics .metric{padding:.6rem .5rem;min-height:85px;border-radius:10px;flex-direction:column;gap:.3rem}
+  .dashboard-metrics .metric-icon{display:none}
+  .dashboard-metrics .metric h2{font-size:.8rem;line-height:1.24;overflow-wrap:anywhere}
+  .dashboard-metrics .metric strong{font-size:1.58rem;margin-top:.32rem}
+  .dashboard-next{padding:.85rem;border-radius:12px}
+  .dashboard-next>div{grid-template-columns:1fr;gap:.42rem;margin-top:.65rem}
+  .dashboard-shortcut{gap:.15rem;padding:.65rem .73rem}
+  .dashboard-shortcut span{font-size:.83rem}
+  .site-footer{padding-top:1.35rem}
+  .footer-grid{gap:.9rem;padding-bottom:1.15rem}
+  .footer-brand p{margin-top:.55rem;max-width:38ch;font-size:.9rem}
+  .footer-nav{gap:.85rem .6rem}
+  .footer-nav h2{margin-bottom:.3rem}
+  .footer-nav a{margin-top:0;padding:.31rem 0;line-height:1.29}
+  .footer-bottom{padding-block:.69rem}
+}
+@media(max-width:620px){
+  html{scroll-padding-top:4.4rem}
+  input:not([type=checkbox]),select,textarea{font-size:1rem}
+  .shipment-search .input-row{display:grid;grid-template-columns:minmax(0,1fr) auto}
+}
