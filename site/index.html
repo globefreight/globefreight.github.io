@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Track your PrimeFreight Express shipment and view its latest delivery updates.">
+  <meta name="referrer" content="no-referrer">
+  <title>PrimeFreight Express | Shipment Tracking</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script defer src="assets/app.js"></script>
+</head>
+<body>
+<header class="header">
+  <div class="shell header-inner">
+    <a class="brand" href="#" aria-label="PrimeFreight Express home"><span class="brand-mark" aria-hidden="true">◈</span><span>PrimeFreight <small>EXPRESS</small></span></a>
+    <nav aria-label="Main navigation">
+      <a href="#tracking">Track a shipment</a>
+      <a class="portal-link" href="#portal">Team portal</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <div id="public-page">
+    <section class="hero">
+      <div class="shell hero-inner">
+        <p class="eyebrow"><span></span> FREIGHT &amp; LOGISTICS</p>
+        <h1>Freight in motion.<br><em>Clarity at every step.</em></h1>
+        <p>Follow your shipment from dispatch to delivery with PrimeFreight Express.</p>
+      </div>
+    </section>
+    <section class="shell tracking-area" id="tracking" aria-labelledby="tracking-title">
+      <div class="card tracking-card">
+        <div class="tracking-heading"><span class="icon-box" aria-hidden="true">⌖</span><div>
+          <h2 id="tracking-title">Track your shipment</h2>
+          <p>Enter the tracking number from your shipment confirmation.</p>
+        </div></div>
+        <form id="track-form">
+          <label for="tracking-code">Tracking number</label>
+          <div class="input-row">
+            <input id="tracking-code" name="code" placeholder="Enter your PF tracking number" maxlength="50" required autocomplete="off" spellcheck="false">
+            <button type="submit">Track shipment</button>
+          </div>
+        </form>
+        <p id="track-message" role="status" hidden></p>
+        <button type="button" class="text-button" id="sample">Try a sample shipment</button>
+      </div>
+      <section class="card results" id="tracking-result" aria-label="Shipment results" aria-live="polite" hidden></section>
+      <div class="milestones" aria-label="Shipment milestones">
+        <article><span class="milestone-icon" aria-hidden="true">◇</span><div><h3>Dispatch</h3><p>See when your freight is picked up.</p></div></article>
+        <article><span class="milestone-icon" aria-hidden="true">⇄</span><div><h3>In transit</h3><p>Follow recorded movement and exceptions.</p></div></article>
+        <article><span class="milestone-icon" aria-hidden="true">✓</span><div><h3>Delivery</h3><p>Check the latest delivery milestone.</p></div></article>
+      </div>
+    </section>
+  </div>
+  <section id="portal-page" class="shell portal" aria-labelledby="portal-title" hidden>
+    <div class="portal-heading"><div><p class="eyebrow"><span></span> PRIMEFREIGHT EXPRESS</p><h1 id="portal-title">Team portal</h1></div><button type="button" class="secondary" id="logout" hidden>Sign out</button></div>
+    <p id="portal-message" role="status" hidden></p>
+    <div id="signin-card" class="card signin">
+      <h2 id="signin-title">Staff sign-in</h2>
+      <div class="login-switch" aria-label="Choose account type">
+        <button type="button" class="secondary" id="staff-mode" aria-pressed="true">Staff login</button>
+        <button type="button" class="secondary" id="admin-mode" aria-pressed="false">Admin login</button>
+      </div>
+      <form id="signin-form">
+        <label>Email <input type="email" name="email" required autocomplete="username"></label>
+        <label>Password <input type="password" name="password" required autocomplete="current-password"></label>
+        <button type="submit">Sign in</button>
+      </form>
+    </div>
+    <div id="workspace" hidden>
+      <div class="workspace-grid">
+        <aside class="card list-card">
+          <h2>Shipments</h2>
+          <p id="identity" class="muted"></p>
+          <button id="new-shipment" type="button" hidden>New shipment</button>
+          <button id="refresh-workspace" class="secondary" type="button">Refresh list</button>
+          <div id="shipment-list" aria-label="Available shipments"></div>
+          <button id="next-page" class="secondary" type="button" hidden>Load more</button>
+        </aside>
+        <div id="shipment-detail" class="card detail-card"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="shell footer-inner"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">◈</span><span>PrimeFreight <small>EXPRESS</small></span></a><span>Shipment tracking &amp; logistics</span></div></footer>
+</body>
+</html>
+
