@@ -64,6 +64,14 @@ select net.http_post(
 
 Test with addresses you control before opening the form to customers. The queue records provider acceptance for complaint replies. Monitor delivery and bounce information in Resend. Customer email acknowledgements do not repeat complaint descriptions.
 
+## Enable exception follow-up, complaint status links, CSV import, and labels
+
+1. Run [the team tools migration](supabase/migrations/20261119000300_globefreight_team_tools.sql) after the operations migration. Redeploy the updated [email function](supabase/functions/send-globefreight-email/index.ts) so it includes complaint status links.
+2. In **Delivery exception queue**, review reported exceptions, shipments past ETA, and shipments with no new update for 48 hours. The ETA day is evaluated in UTC. Assign follow-up to a staff member with access to that shipment, or leave it in the admin queue. A later shipment event opens a fresh follow-up if the shipment still meets the queue criteria.
+3. New complaint receipts include a private 60-day status link once email is configured. For an existing case, open **Email customer and view recent replies → Email a new status link**. Issuing a new link disables the previous one. The link shows the reference, status, and receipt date.
+4. Under **Import shipments from CSV**, download the template, replace the example row, and upload up to 100 shipments. Use one of the listed service names and use YYYY-MM-DD for optional ETAs. Review every row before selecting **Create shipments**. An invalid database row rolls back the batch.
+5. Open a shipment on the hosted site and choose **Print shipping label**. The layout is sized for 4 × 6 in and the QR code opens the shipment's public tracking page. Use the browser print dialog to select a label printer or save a PDF.
+
 ## Deploy staff account creation in Supabase
 
 In **Edge Functions**, choose **Deploy a new function → Via Editor**. Name it `create-staff` and replace the editor contents with [the included function](supabase/functions/create-staff/index.ts), then deploy it. In the function's **Details** tab, turn off **Verify JWT with legacy secret**. The handler verifies the Supabase Auth session itself and checks the live administrator role before creating an account. It uses Supabase's built-in server-side credentials. No Node.js or PowerShell is needed.

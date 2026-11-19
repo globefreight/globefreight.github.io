@@ -20,7 +20,9 @@
   <title>GlobeFreight Express | Shipment Tracking</title>
   <link rel="stylesheet" href="assets/style.css">
   <script defer src="assets/business-details.js"></script>
+  <script defer src="assets/qrcode-generator.js"></script>
   <script defer src="assets/app.js"></script>
+  <script defer src="assets/team-tools.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -172,6 +174,14 @@
       </div>
     </section>
   </div>
+  <section id="case-status-page" class="shell portal" aria-labelledby="case-status-title" hidden>
+    <div class="card">
+      <h1 id="case-status-title">Complaint status</h1>
+      <div id="private-case-result" aria-live="polite"></div>
+      <p id="private-case-message" role="status" hidden></p>
+      <button id="refresh-private-case" class="secondary" type="button">Refresh status</button>
+    </div>
+  </section>
   <section id="delivery-page" class="shell portal" aria-labelledby="delivery-title" hidden>
     <div class="card">
       <h1 id="delivery-title">Proof of delivery</h1>
@@ -216,6 +226,27 @@
         <button id="more-complaints" class="secondary" type="button" hidden>Load more complaints</button>
       </section>
       <div id="shipment-workspace">
+        <details class="card team-tool" id="exception-queue">
+          <summary>Delivery exception queue</summary>
+          <p class="muted">Reported exceptions, shipments past their estimated delivery date, and shipments with no update for 48 hours.</p>
+          <div class="actions">
+            <button id="refresh-exceptions" class="secondary" type="button">Refresh queue</button>
+            <button id="more-exceptions" class="secondary" type="button" hidden>Load more</button>
+          </div>
+          <p id="exceptions-message" role="status" hidden></p>
+          <div id="exception-list"></div>
+        </details>
+        <details class="card team-tool" id="shipment-import" hidden>
+          <summary>Import shipments from CSV</summary>
+          <p class="muted">Upload up to 100 shipments at a time. Review the parsed rows before creating them.</p>
+          <a class="text-button" href="assets/shipment-import-template.csv" download>Download CSV template</a>
+          <form id="shipment-import-form" class="fields">
+            <label>Shipment CSV <input id="shipment-csv" type="file" accept=".csv,text/csv" required></label>
+            <div id="shipment-import-preview"></div>
+            <div><button id="shipment-import-submit" type="submit" disabled>Create shipments</button></div>
+          </form>
+          <p id="shipment-import-message" role="status" hidden></p>
+        </details>
         <div id="admin-operations" class="admin-operations" hidden>
           <details id="quote-queue" class="card">
             <summary>Quote requests</summary>
@@ -288,6 +319,7 @@
     <div class="footer-bottom"><small>&copy; GlobeFreight Express</small><a href="#">Back to top</a></div>
   </div>
 </footer>
+<div id="print-label" hidden></div>
 </body>
 </html>
 

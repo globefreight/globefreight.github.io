@@ -197,3 +197,26 @@ code{overflow-wrap:anywhere}
 #business-contact p{margin:.65rem 0}
 #business-contact a{text-decoration:underline}
 @media(max-width:760px){.admin-operations{grid-template-columns:1fr}}
+.team-tool{margin-bottom:1rem;padding:1.15rem}
+.team-tool>summary{cursor:pointer;font-weight:800}
+.team-tool .record label{margin-top:.45rem}
+.csv-preview{overflow:auto;max-height:20rem}
+.csv-preview table{width:100%;border-collapse:collapse;font-size:.9rem}
+.csv-preview th,.csv-preview td{padding:.5rem;text-align:left;border-bottom:1px solid var(--line);overflow-wrap:anywhere;min-width:6rem}
+.csv-preview thead{position:sticky;top:0;background:var(--paper)}
+.badge[data-status="Handled"]{background:#dcf5e4;color:#155630}
+@media print{
+  body.printing-label{margin:0;min-width:0;background:#fff;color:#000}
+  body.printing-label > :not(#print-label){display:none!important}
+  body.printing-label #print-label{display:block!important;page:shipping-label;width:3.65in;padding:.1in;margin:auto;color:#000;background:#fff;font:12pt/1.4 system-ui,sans-serif}
+  #print-label .label-brand{display:flex;gap:.12in;align-items:center;font-weight:800;font-size:16pt}
+  #print-label .label-brand img{width:.44in;height:.44in}
+  #print-label .label-kicker{font-size:9pt;font-weight:800}
+  #print-label .label-core{border-block:2pt solid #000;margin:.17in 0;padding:.1in 0}
+  #print-label h2{font:700 16pt/1.2 system-ui,sans-serif;letter-spacing:0}
+  #print-label p{margin:.08in 0}
+  #print-label code{display:block;font-size:9.5pt;overflow-wrap:anywhere}
+  #print-label .label-qr{display:block;width:1.55in;height:1.55in;image-rendering:pixelated;margin:.12in auto}
+  #print-label .label-scan{text-align:center}
+  @page shipping-label{size:4in 6in;margin:.14in}
+}

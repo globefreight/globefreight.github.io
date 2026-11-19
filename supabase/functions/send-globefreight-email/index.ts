@@ -52,6 +52,11 @@ Deno.serve(async (request: Request) => {
         tracking.searchParams.set('tracking', job.tracking_code);
         text.push('Track your shipment: ' + tracking.href);
       }
+      if (job.case_token) {
+        const complaint = new URL(site);
+        complaint.hash = 'case=' + job.case_token;
+        text.push('Check your complaint status: ' + complaint.href);
+      }
       if (job.proof_token) {
         const proof = new URL(site);
         proof.hash = 'delivery=' + job.proof_token;

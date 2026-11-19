@@ -216,6 +216,7 @@ function clearSession() {
   $('workspace').hidden = true;
   $('open-inbox').hidden = true;
   clearAdminOperations();
+  resetTeamTools();
   closeComplaintInbox();
   $('logout').hidden = true;
 }
@@ -235,6 +236,7 @@ bind($('signin-form'), async (values) => {
   $('signin-form').reset();
   $('identity').textContent = (isAdmin ? 'Administrator' : 'Staff') + ' · ' + auth.user.email;
   $('admin-operations').hidden = !isAdmin;
+  $('shipment-import').hidden = !isAdmin;
   $('identity').hidden = false;
   $('portal-title').textContent = isAdmin ? 'Operations dashboard' : 'Shipment dashboard';
   $('metric-shipments-label').textContent = isAdmin ? 'Total shipments' : 'Assigned shipments';
@@ -283,17 +285,19 @@ $('logout').onclick = async () => {
 function route() {
   const portal = location.hash === '#portal';
   const delivery = location.hash.startsWith('#delivery=');
+  const caseStatus = location.hash.startsWith('#case=');
   const wasOnPrivatePage = $('public-page').hidden;
-  $('public-page').hidden = portal || delivery;
+  $('public-page').hidden = portal || delivery || caseStatus;
   $('portal-page').hidden = !portal;
   $('delivery-page').hidden = !delivery;
+  $('case-status-page').hidden = !caseStatus;
   if (delivery) message($('delivery-message'));
-  if (portal || delivery || (wasOnPrivatePage && !location.hash)) window.scrollTo(0, 0);
+  if (portal || delivery || caseStatus || (wasOnPrivatePage && !location.hash)) window.scrollTo(0, 0);
   if (!portal && wasOnPrivatePage && !$('complaint-inbox').hidden) {
     closeComplaintInbox();
     $('open-inbox').hidden = !session;
   }
-  if (!portal && !delivery && wasOnPrivatePage && location.hash) {
+  if (!portal && !delivery && !caseStatus && wasOnPrivatePage && location.hash) {
     $(location.hash.slice(1))?.scrollIntoView();
   }
 }
@@ -526,6 +530,7 @@ async function openShipment(id) {
         message($('portal-message'), 'Tracking link copied.');
       }));
     }
+    trackingActions.append(button('Print shipping label', () => printShipmentLabel(shipment, link)));
     detail.append(trackingActions);
 
     const facts = [shipment.service, shipment.eta && 'Estimated delivery ' + dateOnly.format(new Date(shipment.eta)),
@@ -815,7 +820,11 @@ function complaintReplies(record) {
     message(feedback, 'Reply queued for email.');
     await loadReplies();
   }, 'Queue email reply', field('Reply to customer', 'reply', { multiline: true, required: true, max: 2000 })));
-  section.append(feedback, button('Refresh reply history', loadReplies), history);
+  section.append(feedback, button('Refresh reply history', loadReplies),
+    button('Email a new status link', async () => {
+      await teamTool('case-link', { id: record.id });
+      message(feedback, 'A new private status link is queued. The previous link is disabled.');
+    }), history);
   section.addEventListener('toggle', () => {
     if (section.open) loadReplies().catch(error => message(feedback, error.message, true));
   });
