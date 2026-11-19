@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Track your GlobeFreight Express shipment and view its latest delivery updates.">
+  <meta name="description" content="Plan a shipment, request a freight quote, or follow delivery updates with GlobeFreight Express.">
   <meta name="referrer" content="no-referrer">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="GlobeFreight Express">
-  <meta property="og:title" content="GlobeFreight Express | Shipment Tracking">
-  <meta property="og:description" content="Enter your tracking number for shipment status and delivery updates.">
+  <meta property="og:title" content="GlobeFreight Express | Freight, Tracking &amp; Support">
+  <meta property="og:description" content="Plan a shipment, follow its progress, and get support when you need it.">
   <meta property="og:url" content="__GLOBEFREIGHT_SITE_URL__/">
   <meta property="og:image" content="__GLOBEFREIGHT_SITE_URL__/assets/link-preview.png?v=2">
   <meta property="og:image:width" content="1200">
@@ -17,7 +17,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="assets/globe-mark.svg?v=2">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
-  <title>GlobeFreight Express | Shipment Tracking</title>
+  <title>GlobeFreight Express | Freight, Tracking &amp; Support</title>
   <link rel="stylesheet" href="assets/style.css">
   <script defer src="assets/business-details.js"></script>
   <script defer src="assets/qrcode-generator.js"></script>
@@ -27,14 +27,16 @@
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<header class="header">
+<header class="header" id="page-top">
+  <div class="header-service"><div class="shell"><span>Freight &amp; logistics</span><a href="#tracking-help">Help center</a></div></div>
   <div class="shell header-inner">
-    <a class="brand" href="#" aria-label="GlobeFreight Express home"><img class="brand-mark" src="assets/globe-mark.svg?v=2" alt="" width="42" height="42"><span>GlobeFreight <small>EXPRESS</small></span></a>
+    <a class="brand" href="#" data-home-link aria-label="GlobeFreight Express home"><img class="brand-mark" src="assets/globe-mark.svg?v=2" alt="" width="42" height="42"><span>GlobeFreight <small>EXPRESS</small></span></a>
     <nav class="main-nav" aria-label="Main navigation">
-      <a href="#tracking">Track a shipment</a>
+      <a href="#" data-home-link>Home</a>
+      <a href="#tracking">Tracking</a>
       <a href="#about">About us</a>
       <a href="#design-print">Design &amp; print</a>
-      <a href="#quote">Request a quote</a>
+      <a class="quote-link" href="#quote">Get a quote</a>
       <a href="#contact">Contact</a>
       <a class="portal-link" href="#portal">Team portal</a>
     </nav>
@@ -42,14 +44,26 @@
 </header>
 <main id="main">
   <div id="public-page">
-    <section class="hero">
+    <section class="hero home-hero" data-public-view="home">
       <div class="shell hero-inner">
-        <p class="eyebrow"><span></span> FREIGHT &amp; LOGISTICS</p>
-        <h1>Know where<br><em>your freight stands.</em></h1>
-        <p>Check your latest shipment status, estimated delivery, and milestone history in one place.</p>
+        <p class="eyebrow"><span></span> GLOBEFREIGHT EXPRESS</p>
+        <h1>Freight in motion.<br><em>Clarity at every step.</em></h1>
+        <p>Plan your shipment, follow recorded milestones, and get help when delivery plans change.</p>
+        <div class="hero-actions"><a class="section-cta" href="#tracking">Track a shipment</a><a class="hero-secondary" href="#quote">Request a quote</a></div>
       </div>
     </section>
-    <section class="shell tracking-area" id="tracking" aria-labelledby="tracking-title">
+    <section class="shell home-pathways" data-public-view="home" aria-label="Shipment services">
+      <article class="card pathway"><h2>Plan a shipment</h2><p>Share your route, dimensions, and preferred freight service. The team reviews the details before sending a quote.</p><a href="#quote">Request a freight quote</a></article>
+      <article class="card pathway"><h2>Follow your freight</h2><p>Check the latest shipment status, estimated delivery, and the events recorded along the way.</p><a href="#tracking">Open tracking</a></article>
+      <article class="card pathway"><h2>Get help with a shipment</h2><p>Find out what a status means or send the support team an issue with your tracking number.</p><a href="#contact">Contact support</a></article>
+    </section>
+    <section class="shell editorial-band" data-public-view="home">
+      <div><p class="eyebrow"><span></span> SHIPMENT JOURNEY</p><h2>Know what happens next.</h2></div>
+      <div><p>A tracking event tells you what has been recorded. Use the milestone guide to understand pickup, transit, and delivery, and what to look for when an exception is posted.</p><a class="text-button" href="#milestones">Explore shipment milestones</a></div>
+    </section>
+    <div class="page-mast" data-public-view="tracking" hidden><div class="shell"><p class="eyebrow"><span></span> SHIPMENT VISIBILITY</p><h1>Track your freight</h1><p>Check the latest recorded event, review the route and estimated delivery, or follow a confirmed pickup window.</p></div></div>
+    <section class="shell tracking-area page-tracking" data-public-view="tracking" hidden id="tracking" aria-labelledby="tracking-title">
+      <div class="track-layout">
       <div class="card tracking-card">
         <div class="tracking-heading"><span class="icon-box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><div>
           <h2 id="tracking-title">Track your shipment</h2>
@@ -65,9 +79,16 @@
         <p id="track-message" role="status" hidden></p>
         <a class="text-button tracking-help-link" href="#tracking-help">Need help finding your tracking number?</a>
       </div>
+        <aside class="card tracking-guide">
+          <h2>Reading your updates</h2>
+          <p>The latest recorded event appears first in the timeline. A delivery estimate may change as new events are recorded.</p>
+          <a class="text-button" href="#milestones">View the milestone guide</a>
+        </aside>
+      </div>
       <section class="card results" id="tracking-result" aria-label="Shipment results" aria-live="polite" hidden></section>
     </section>
-    <section class="shell home-milestones" id="milestones" aria-labelledby="milestones-title">
+    <div class="page-mast" data-public-view="milestones" hidden><div class="shell"><p class="eyebrow"><span></span> TRACKING GUIDE</p><h1>Shipment milestones</h1><p>Understand the events you may see from the time a shipment is entered until delivery is recorded.</p></div></div>
+    <section class="shell home-milestones" data-public-view="milestones" hidden id="milestones" aria-labelledby="milestones-title">
       <h2 id="milestones-title">From pickup to delivery</h2>
       <p class="section-intro">Read the latest status to see where your shipment is in its journey.</p>
       <div class="milestones">
@@ -75,12 +96,20 @@
         <article><span class="milestone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6h9a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h9"/></svg></span><div><h3>In transit</h3><p>Follow progress between facilities and look for customs or exception updates when posted.</p></div></article>
         <article><span class="milestone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><div><h3>Delivery</h3><p>Check when your freight is out for delivery and when delivery is recorded.</p></div></article>
       </div>
+      <div class="reading-grid">
+        <article><h3>Before collection</h3><p>Label created means the record is ready. A separate pickup event tells you when the freight was collected.</p></article>
+        <article><h3>When plans change</h3><p>A customs event or delivery exception may affect timing. Check the most recent note and share your tracking number if you need help.</p></article>
+      </div>
+      <a class="section-cta" href="#tracking">Check a tracking number</a>
     </section>
-    <section class="home-help" id="tracking-help" aria-labelledby="help-title">
+    <div class="page-mast" data-public-view="tracking-help" hidden><div class="shell"><p class="eyebrow"><span></span> CUSTOMER HELP</p><h1>Tracking help center</h1><p>Find your tracking number, understand common statuses, and know when to contact support.</p></div></div>
+    <section class="home-help" data-public-view="tracking-help" hidden id="tracking-help" aria-labelledby="help-title">
       <div class="shell help-grid">
         <div>
           <h2 id="help-title">Tracking help</h2>
-          <a class="text-button tracking-help-link" href="#tracking">Back to shipment tracking</a>
+          <p class="section-intro">Have your tracking number and the latest event handy so the team can locate the right shipment.</p>
+          <a class="text-button tracking-help-link" href="#tracking">Open shipment tracking</a>
+          <br><a class="text-button" href="#contact">Contact support</a>
         </div>
         <div class="faq-list">
           <details>
@@ -102,17 +131,23 @@
         </div>
       </div>
     </section>
-    <section class="shell home-milestones" id="about" aria-labelledby="about-title">
-      <div class="company-panel">
-        <div>
-          <p class="eyebrow"><span></span> ABOUT US</p>
-          <h2 id="about-title">GlobeFreight Express</h2>
-          <p>GlobeFreight Express provides shipment tracking and customer support for freight customers. Use your tracking number to check recorded milestones, review delivery estimates, or report an issue to our team.</p>
-        </div>
-        <a class="section-cta" href="#tracking">Track a shipment</a>
+    <div class="page-mast" data-public-view="about" hidden><div class="shell"><p class="eyebrow"><span></span> ABOUT US</p><h1>About GlobeFreight Express</h1><p>Freight planning, shipment visibility, and customer support in one place.</p></div></div>
+    <section class="shell feature-layout" data-public-view="about" hidden id="about" aria-labelledby="about-title">
+      <div>
+        <h2 id="about-title">From quote to delivery</h2>
+        <p>Start with the route and package details. A quote lets you review the price and service before the team books the shipment. Once booked, your tracking number connects you to the shipment record.</p>
+        <h3>Support when your plans change</h3>
+        <p>If collection, transit, or delivery needs attention, share the tracking number so we can find the latest event. If you submit a complaint, keep your case reference for follow-up.</p>
+        <a class="text-button" href="#quote">Get a freight quote</a>
       </div>
+      <img class="feature-photo" src="assets/freight-warehouse.jpg" alt="Forklift in a warehouse aisle lined with cargo pallets" width="640" height="430" loading="lazy">
     </section>
-    <section class="home-help locations-section" id="design-print" aria-labelledby="locations-title">
+    <div class="page-mast" data-public-view="design-print" hidden><div class="shell"><p class="eyebrow"><span></span> DESIGN &amp; PRINT</p><h1>Plan your print project</h1><p>Ask about artwork, quantities, print specifications, and delivery options before arranging a drop-off or visit.</p></div></div>
+    <section class="shell feature-layout" data-public-view="design-print" hidden>
+      <div><h2>What to include in your inquiry</h2><ul class="editorial-list"><li>Finished size, quantity, and expected delivery date</li><li>Artwork format and any proofing requirements</li><li>Paper, finish, and packaging preferences</li><li>Destination or preferred collection area</li></ul><a class="text-button" href="#contact">Contact us about design and print</a></div>
+      <img class="feature-photo" src="assets/print-press.jpg" alt="Paper moving through a commercial printing press" width="640" height="430" loading="lazy">
+    </section>
+    <section class="home-help locations-section" data-public-view="design-print" hidden id="design-print" aria-labelledby="locations-title">
       <div class="shell">
         <h2 id="locations-title">Design &amp; print locations</h2>
         <p class="section-intro">GlobeFreight service at the listed addresses is pending confirmation.</p>
@@ -123,10 +158,12 @@
         </div>
       </div>
     </section>
-    <section class="shell contact-section" id="quote" aria-labelledby="quote-title">
+    <div class="page-mast" data-public-view="quote" hidden><div class="shell"><p class="eyebrow"><span></span> FREIGHT QUOTES</p><h1>Request a freight quote</h1><p>Tell us what you need to move so the team can review the route, package size, and preferred service.</p></div></div>
+    <section class="shell contact-section" data-public-view="quote" hidden id="quote" aria-labelledby="quote-title">
       <div>
-        <h2 id="quote-title">Request a freight quote</h2>
-        <p class="section-intro">Tell us where it’s going, how large it is, and which service you prefer. Our team will review the request and contact you at the email provided.</p>
+        <h2 id="quote-title">Prepare your shipment details</h2>
+        <p class="section-intro">Use the dimensions and weight of the packed shipment. Choose the service you prefer and enter an email where you can review the offer.</p>
+        <ol class="editorial-list"><li>Submit the route and package measurements.</li><li>Review the price, service, and expiry when the quote arrives.</li><li>Accept the offer so the team can book and send your tracking link.</li></ol>
       </div>
       <div class="card">
         <form id="quote-form" class="fields">
@@ -145,10 +182,12 @@
         <p id="quote-message" role="status" hidden></p>
       </div>
     </section>
-    <section class="shell contact-section" id="contact" aria-labelledby="contact-title">
+    <div class="page-mast" data-public-view="contact" hidden><div class="shell"><p class="eyebrow"><span></span> CUSTOMER SUPPORT</p><h1>Contact GlobeFreight</h1><p>Tell us about a shipment issue or a design and print inquiry. We’ll use the information you provide to route your request.</p></div></div>
+    <section class="shell contact-section" data-public-view="contact" hidden id="contact" aria-labelledby="contact-title">
       <div>
-        <h2 id="contact-title">Contact us</h2>
-        <p class="section-intro">Report an issue with a shipment or send feedback about design and print. Include your tracking number if the issue relates to a shipment.</p>
+        <h2 id="contact-title">Help us find your request</h2>
+        <p class="section-intro">Include your tracking number for shipment issues and describe what happened, when it happened, and what outcome would help.</p>
+        <p>After submitting, save your case reference. If you receive a private status link, use it to follow the case and keep it for your own records.</p>
         <div id="business-contact" hidden></div>
         <a class="text-button tracking-help-link" href="#tracking-help">Read tracking help</a>
       </div>
@@ -208,7 +247,8 @@
       </div>
     </div>
     <p id="portal-message" role="status" hidden></p>
-    <div id="signin-card" class="card signin">
+    <div class="signin-layout" id="signin-layout">
+      <div id="signin-card" class="card signin">
       <h2 id="signin-title">Staff sign-in</h2>
       <div class="login-switch" aria-label="Choose account type">
         <button type="button" class="secondary" id="staff-mode" aria-pressed="true">Staff login</button>
@@ -219,8 +259,25 @@
         <label>Password <input type="password" name="password" required autocomplete="current-password"></label>
         <button type="submit">Sign in</button>
       </form>
+      </div>
+      <aside class="card signin-guide">
+        <h2>Team access</h2>
+        <p>Staff sign in to work on the shipments and cases assigned to them. Administrators can also manage accounts, quote requests, and access permissions.</p>
+        <p class="muted">If you need a staff account, contact your GlobeFreight administrator.</p>
+      </aside>
     </div>
-    <div id="workspace" hidden>
+    <div id="workspace" class="dashboard-shell" hidden>
+      <nav class="dashboard-rail card" aria-label="Dashboard navigation">
+        <p class="dashboard-rail-title">Workspace</p>
+        <button type="button" class="secondary" data-dashboard-tab="overview" aria-current="page">Overview</button>
+        <button type="button" class="secondary" data-dashboard-tab="shipments">Shipments</button>
+        <button type="button" class="secondary" data-dashboard-tab="pickups">Pickup requests</button>
+        <button type="button" class="secondary" data-dashboard-tab="exceptions">Delivery exceptions</button>
+        <button type="button" class="secondary" data-dashboard-tab="complaints">Complaints inbox</button>
+        <button type="button" class="secondary" data-dashboard-tab="quotes" data-admin-tool hidden>Quote requests</button>
+        <button type="button" class="secondary" data-dashboard-tab="team" data-admin-tool hidden>Team &amp; activity</button>
+      </nav>
+      <div class="dashboard-main">
       <section class="card inbox-panel" id="complaint-inbox" aria-labelledby="inbox-title" hidden>
         <div class="section-header">
           <div><h2 id="inbox-title">Complaints inbox</h2><p id="inbox-scope" class="muted"></p></div>
@@ -233,8 +290,11 @@
         <div id="complaint-list"></div>
         <button id="more-complaints" class="secondary" type="button" hidden>Load more complaints</button>
       </section>
-      <div id="shipment-workspace">
-        <details class="card team-tool" id="pickup-queue">
+      <div id="shipment-workspace" data-dashboard-view="overview">
+        <section class="dashboard-intro" data-dashboard-area="overview">
+          <div><h2>Operations overview</h2><p>Review today’s shipment activity, then open the workspace you need.</p></div>
+        </section>
+        <details class="card team-tool" id="pickup-queue" data-dashboard-area="pickups">
           <summary>Pickup requests</summary>
           <div class="actions">
             <button id="refresh-pickups" class="secondary" type="button">Refresh pickups</button>
@@ -243,7 +303,7 @@
           <p id="pickups-message" role="status" hidden></p>
           <div id="pickup-list"></div>
         </details>
-        <details class="card team-tool" id="exception-queue">
+        <details class="card team-tool" id="exception-queue" data-dashboard-area="exceptions">
           <summary>Delivery exception queue</summary>
           <p class="muted">Reported exceptions, shipments past their estimated delivery date, and shipments with no update for 48 hours.</p>
           <div class="actions">
@@ -253,7 +313,7 @@
           <p id="exceptions-message" role="status" hidden></p>
           <div id="exception-list"></div>
         </details>
-        <details class="card team-tool" id="shipment-import" hidden>
+        <details class="card team-tool" id="shipment-import" data-dashboard-area="team" hidden>
           <summary>Import shipments from CSV</summary>
           <p class="muted">Upload up to 100 shipments at a time. Review the parsed rows before creating them.</p>
           <a class="text-button" href="assets/shipment-import-template.csv" download>Download CSV template</a>
@@ -265,7 +325,7 @@
           <p id="shipment-import-message" role="status" hidden></p>
         </details>
         <div id="admin-operations" class="admin-operations" hidden>
-          <details id="quote-queue" class="card">
+          <details id="quote-queue" data-dashboard-area="quotes" class="card">
             <summary>Quote requests</summary>
             <div class="actions">
               <button id="refresh-quotes" class="secondary" type="button">Refresh quotes</button>
@@ -274,7 +334,7 @@
             <p id="quotes-status" role="status" hidden></p>
             <div id="quote-list"></div>
           </details>
-          <details id="activity-log" class="card">
+          <details id="activity-log" data-dashboard-area="team" class="card">
             <summary>Admin activity log</summary>
             <div class="actions">
               <button id="refresh-activity" class="secondary" type="button">Refresh activity</button>
@@ -284,12 +344,21 @@
             <div id="activity-list"></div>
           </details>
         </div>
-        <section class="dashboard-metrics" aria-label="Shipment overview">
+        <section class="dashboard-metrics" data-dashboard-area="overview" aria-label="Shipment overview">
           <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 9L4 7.5M12 12l8-4.5M12 12v9"/></svg></span><div><h2 id="metric-shipments-label">Shipments</h2><strong id="metric-shipments">&mdash;</strong></div></article>
           <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 12h4l3-6 3 12 2-6h4"/></svg></span><div><h2>Tracking updates today</h2><strong id="metric-updates">&mdash;</strong></div></article>
           <article class="card metric"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><div><h2>Deliveries recorded today</h2><strong id="metric-deliveries">&mdash;</strong></div></article>
         </section>
-        <details class="card staff-create" id="staff-create" hidden>
+        <section class="card dashboard-next" data-dashboard-area="overview" aria-labelledby="dashboard-next-title">
+          <h2 id="dashboard-next-title">Choose where to work</h2>
+          <div>
+            <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="shipments"><strong>Manage shipments</strong><span>Find shipments, update tracking, and print labels.</span></button>
+            <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="pickups"><strong>Review pickups</strong><span>Open proposed pickup windows and record a decision.</span></button>
+            <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="exceptions"><strong>Follow up on exceptions</strong><span>Review delays, stalled shipments, and assigned issues.</span></button>
+            <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="complaints"><strong>Handle complaints</strong><span>Review cases and send replies or status links.</span></button>
+          </div>
+        </section>
+        <details class="card staff-create" id="staff-create" data-dashboard-area="team" hidden>
           <summary>Create staff login</summary>
           <p class="muted">Create a login here, then assign the account to shipments under Staff access.</p>
           <form id="create-staff-form" class="fields">
@@ -301,7 +370,7 @@
           </form>
           <p id="create-staff-message" role="status" hidden></p>
         </details>
-        <div class="workspace-grid">
+        <div class="workspace-grid" data-dashboard-area="shipments">
           <aside class="card list-card">
             <div class="list-heading">
               <h2>Shipments</h2>
@@ -318,6 +387,7 @@
           <div id="shipment-detail" class="card detail-card"></div>
         </div>
       </div>
+      </div>
     </div>
   </section>
 </main>
@@ -325,15 +395,16 @@
   <div class="shell">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a class="brand" href="#" aria-label="GlobeFreight Express home"><img class="brand-mark" src="assets/globe-mark.svg?v=2" alt="" width="42" height="42"><span>GlobeFreight <small>EXPRESS</small></span></a>
+        <a class="brand" href="#" data-home-link aria-label="GlobeFreight Express home"><img class="brand-mark" src="assets/globe-mark.svg?v=2" alt="" width="42" height="42"><span>GlobeFreight <small>EXPRESS</small></span></a>
+        <p>Shipment planning, tracking, and support from quote through delivery.</p>
       </div>
       <nav class="footer-nav" aria-label="Footer navigation">
         <div><h2>Shipments</h2><a href="#tracking">Track a shipment</a><a href="#milestones">Shipment milestones</a><a href="#tracking-help">Tracking help</a><a href="#quote">Request a quote</a></div>
-        <div><h2>Company</h2><a href="#about">About us</a><a href="#design-print">Design &amp; print locations</a><a href="#contact">Contact and complaints</a></div>
+        <div><h2>Company</h2><a href="#" data-home-link>Home</a><a href="#about">About us</a><a href="#design-print">Design &amp; print locations</a><a href="#contact">Contact and complaints</a></div>
         <div><h2>Team access</h2><a href="#portal">Admin and staff portal</a></div>
       </nav>
     </div>
-    <div class="footer-bottom"><small>&copy; GlobeFreight Express</small><a href="#">Back to top</a></div>
+    <div class="footer-bottom"><small>&copy; GlobeFreight Express</small><a href="#page-top">Back to top</a></div>
   </div>
 </footer>
 <div id="print-label" hidden></div>

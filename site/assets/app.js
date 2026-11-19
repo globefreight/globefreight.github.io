@@ -1,4 +1,24 @@
 const base = 'https://wqxbwpilkmwgagqbdxud.supabase.co';
+const siteRoot = new URL('../', document.currentScript?.src || new URL('assets/app.js', location.href));
+const cleanPages = document.documentElement?.dataset.cleanPages === 'true';
+const pagePaths = {
+  home: '', tracking: 'tracking/', milestones: 'milestones/', 'tracking-help': 'tracking-help/',
+  about: 'about/', 'design-print': 'design-print/', quote: 'quote/', contact: 'contact/', portal: 'portal/'
+};
+const pageTitles = {
+  home: 'Freight, Tracking & Support', tracking: 'Track a Shipment', milestones: 'Shipment Milestones',
+  'tracking-help': 'Tracking Help', about: 'About Us', 'design-print': 'Design & Print',
+  quote: 'Request a Freight Quote', contact: 'Contact & Complaints', portal: 'Team Portal'
+};
+let routed = false;
+function trackingUrl(code) {
+  const url = new URL(cleanPages ? 'tracking/' : '', siteRoot);
+  url.searchParams.set('tracking', code);
+  return url;
+}
+function siteAsset(path) {
+  return new URL('assets/' + path, siteRoot).href;
+}
 const key = 'sb_publishable_7Es7tNh436PTggmxTmE4hQ_I-SMO_RP';
 const services = ['Express', 'Air Freight', 'Ocean Freight', 'Road Freight'];
 const statuses = ['Label created', 'Picked up', 'In transit', 'Customs clearance', 'Out for delivery', 'Delivered', 'Exception', 'Returned'];
@@ -154,7 +174,7 @@ async function track(code, version, background = false) {
   }
   if (!background) {
     trackTimer = setInterval(() => {
-      if (!document.hidden && location.hash !== '#portal') {
+      if (!document.hidden && !$('tracking').hidden && !$('public-page').hidden) {
         track(code, version, true).catch(() => {
           if (version === trackingVersion) message($('track-message'), 'Updates are temporarily unavailable. Showing the last recorded information.', true);
         });
@@ -215,7 +235,9 @@ function clearSession() {
   message($('create-staff-message'));
   $('next-page').hidden = true;
   $('signin-card').hidden = false;
+  $('signin-layout').hidden = false;
   $('workspace').hidden = true;
+  for (const item of document.querySelectorAll('[data-admin-tool]')) item.hidden = true;
   $('open-inbox').hidden = true;
   clearAdminOperations();
   resetTeamTools();
@@ -244,7 +266,10 @@ bind($('signin-form'), async (values) => {
   $('portal-title').textContent = isAdmin ? 'Operations dashboard' : 'Shipment dashboard';
   $('metric-shipments-label').textContent = isAdmin ? 'Total shipments' : 'Assigned shipments';
   $('signin-card').hidden = true;
+  $('signin-layout').hidden = true;
   $('workspace').hidden = false;
+  for (const item of document.querySelectorAll('[data-admin-tool]')) item.hidden = !isAdmin;
+  showDashboardView('overview');
   $('logout').hidden = false;
   $('open-inbox').hidden = false;
   $('new-shipment').hidden = !isAdmin;
@@ -286,28 +311,39 @@ $('logout').onclick = async () => {
 };
 
 function route() {
-  const portal = location.hash === '#portal';
-  const delivery = location.hash.startsWith('#delivery=');
-  const caseStatus = location.hash.startsWith('#case=');
-  const booking = location.hash.startsWith('#quote=') || location.hash.startsWith('#shipment=');
-  const wasOnPrivatePage = $('public-page').hidden;
-  $('public-page').hidden = portal || delivery || caseStatus || booking;
+  const fragment = location.hash.slice(1);
+  if (routed && ['main','page-top'].includes(fragment)) return;
+  const delivery = fragment.startsWith('delivery=');
+  const caseStatus = fragment.startsWith('case=');
+  const booking = fragment.startsWith('quote=') || fragment.startsWith('shipment=');
+  const legacy = Object.hasOwn(pagePaths, fragment) ? fragment : null;
+  const pathname = new URL(location.href).pathname;
+  const path = pathname.startsWith(siteRoot.pathname)
+    ? pathname.slice(siteRoot.pathname.length).replace(/index\.html$/, '').replace(/\/$/, '') : '';
+  const routeName = legacy || (new URLSearchParams(location.search).has('tracking') ? 'tracking' :
+    (cleanPages && Object.hasOwn(pagePaths, path) ? path : 'home'));
+  const portal = routeName === 'portal' && !delivery && !caseStatus && !booking;
+  const privateView = portal || delivery || caseStatus || booking;
+  $('public-page').hidden = privateView;
   $('portal-page').hidden = !portal;
   $('delivery-page').hidden = !delivery;
   $('case-status-page').hidden = !caseStatus;
   $('booking-page').hidden = !booking;
+  for (const view of document.querySelectorAll('[data-public-view]')) view.hidden = view.dataset.publicView !== routeName;
+  for (const link of document.querySelectorAll('[data-current-route]')) {
+    if (!delivery && !caseStatus && !booking && link.dataset.currentRoute === routeName) link.setAttribute('aria-current','page');
+    else link.removeAttribute('aria-current');
+  }
+  const title = delivery ? 'Proof of Delivery' : caseStatus ? 'Complaint Status' : booking ? 'Shipment Services' : pageTitles[routeName];
+  document.title = 'GlobeFreight Express | ' + title;
   if (delivery) message($('delivery-message'));
-  if (portal || delivery || caseStatus || booking || (wasOnPrivatePage && !location.hash)) window.scrollTo(0, 0);
-  if (!portal && wasOnPrivatePage && !$('complaint-inbox').hidden) {
-    closeComplaintInbox();
-    $('open-inbox').hidden = !session;
+  if (privateView || (routed && !['main','page-top'].includes(fragment))) window.scrollTo(0, 0);
+  if (!portal && !$('complaint-inbox').hidden) {
+    showDashboardView('overview');
   }
-  if (!portal && !delivery && !caseStatus && !booking && wasOnPrivatePage && location.hash) {
-    $(location.hash.slice(1))?.scrollIntoView();
-  }
+  routed = true;
 }
 window.addEventListener('hashchange', route);
-route();
 
 function showEmptyDetail() {
   const panel = el('div', undefined, 'detail-empty');
@@ -495,6 +531,7 @@ async function allEvents(id, version) {
 }
 
 async function openShipment(id) {
+  showDashboardView('shipments');
   const version = ++detailVersion;
   selectShipment(id);
   const detail = $('shipment-detail');
@@ -519,10 +556,7 @@ async function openShipment(id) {
     const header = el('div', undefined, 'section-header');
     header.append(el('h2', shipment.origin + ' to ' + shipment.destination), statusBadge(events[0]?.status));
     detail.replaceChildren(header, el('p', shipment.tracking_code, 'muted'));
-    const link = new URL(location.href);
-    link.hash = '';
-    link.search = '';
-    link.searchParams.set('tracking', shipment.tracking_code);
+    const link = trackingUrl(shipment.tracking_code);
     const trackingLink = el('a', 'Open public tracking', 'text-button');
     trackingLink.href = link.href;
     trackingLink.target = '_blank';
@@ -568,8 +602,7 @@ async function openShipment(id) {
 
 $('new-shipment').onclick = () => {
   if (!isAdmin) return;
-  closeComplaintInbox();
-  $('open-inbox').hidden = false;
+  showDashboardView('shipments');
   detailVersion++;
   selectShipment(null);
   message($('portal-message'));
@@ -676,6 +709,7 @@ async function loadComplaintInbox(append = false, reopenId = null) {
 $('open-inbox').onclick = (event) => run(event.currentTarget, async () => {
   $('shipment-workspace').hidden = true;
   $('complaint-inbox').hidden = false;
+  highlightDashboard('complaints');
   $('inbox-scope').textContent = isAdmin ? 'Review customer complaints and manage assignments.' : 'Review complaints assigned to you.';
   $('open-inbox').hidden = true;
   message($('portal-message'));
@@ -683,9 +717,8 @@ $('open-inbox').onclick = (event) => run(event.currentTarget, async () => {
 }, $('inbox-message'));
 
 $('close-inbox').onclick = () => {
-  closeComplaintInbox();
-  $('open-inbox').hidden = false;
-  $('open-inbox').focus();
+  showDashboardView('shipments');
+  document.querySelector('[data-dashboard-tab="shipments"]')?.focus();
 };
 
 $('refresh-inbox').onclick = (event) => run(event.currentTarget, () => loadComplaintInbox(), $('inbox-message'));
@@ -910,6 +943,38 @@ for (const queue of adminQueues) {
   $(queue.refresh).onclick = (event) => run(event.currentTarget, () => loadAdminQueue(queue), $(queue.feedback));
   $(queue.more).onclick = (event) => run(event.currentTarget, () => loadAdminQueue(queue, true), $(queue.feedback));
 }
+
+function highlightDashboard(view) {
+  for (const button of document.querySelectorAll('[data-dashboard-tab]')) {
+    if (button.dataset.dashboardTab === view) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  }
+}
+
+function showDashboardView(view) {
+  if ((view === 'team' || view === 'quotes') && !isAdmin) return;
+  if (view === 'complaints') {
+    if ($('complaint-inbox').hidden) $('open-inbox').click();
+    return;
+  }
+  if (!$('complaint-inbox').hidden) closeComplaintInbox();
+  $('open-inbox').hidden = !session;
+  $('shipment-workspace').dataset.dashboardView = view;
+  highlightDashboard(view);
+  const panel = { pickups:'pickup-queue', exceptions:'exception-queue', quotes:'quote-queue' }[view];
+  if (panel) $(panel).open = true;
+}
+
+for (const button of document.querySelectorAll('[data-dashboard-tab],[data-dashboard-open]')) {
+  button.addEventListener('click', () => {
+    showDashboardView(button.dataset.dashboardTab || button.dataset.dashboardOpen);
+  });
+}
+for (const link of document.querySelectorAll('.main-nav a,.footer-nav a,.header-service a')) {
+  const routeName = link.dataset.homeLink !== undefined ? 'home' : link.getAttribute('href')?.slice(1);
+  if (Object.hasOwn(pagePaths, routeName)) link.dataset.currentRoute = routeName;
+}
+route();
 
 const trackingParam = new URLSearchParams(location.search).get('tracking');
 if (trackingParam && trackingParam.length <= 50) {

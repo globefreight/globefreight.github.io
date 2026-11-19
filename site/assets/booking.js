@@ -18,11 +18,7 @@ function deliveryDateTime(value) {
 
 function trackingAnchor(code) {
   const anchor = el('a', 'Open shipment tracking', 'text-button');
-  const url = new URL(location.href);
-  url.hash = '';
-  url.search = '';
-  url.searchParams.set('tracking', code);
-  anchor.href = url.href;
+  anchor.href = trackingUrl(code).href;
   return anchor;
 }
 

@@ -1,6 +1,6 @@
 # GlobeFreight Express
 
-A shipment-tracking website with a public timeline, separate staff and administrator sign-in modes, and a Supabase-backed team portal. The website uses your Supabase project URL and publishable key. It has no build step.
+A shipment-tracking website with a public timeline, separate staff and administrator sign-in modes, and a Supabase-backed team portal. The website uses your Supabase project URL and publishable key. GitHub Actions generates standalone pages from the shared HTML layout. No local build is required to publish.
 
 ## Set up Supabase
 
@@ -90,9 +90,9 @@ Sign in as administrator and open **Create staff login**. Enter the staff email 
 
 1. Put the contents of this folder, including the hidden `.github` subfolder, at the root of your GitHub repository and push to `main`.
 2. In the repository, go to **Settings → Pages** and select **GitHub Actions** as the source.
-3. Run **Deploy GlobeFreight Express** from the **Actions** tab if the initial push did not deploy. The workflow publishes only the `site/` directory and displays the resulting URL. The migration is applied separately in Supabase.
+3. Run **Deploy GlobeFreight Express** from the **Actions** tab if the initial push did not deploy. The workflow generates and publishes dedicated page URLs from `site/` and displays the resulting URL. The migration is applied separately in Supabase.
 
-To preview locally, run `python -m http.server 8000 --directory site` from this folder and visit `http://localhost:8000`. Public tracking requires an existing shipment in Supabase.
+To preview locally, run `python -m http.server 8000 --directory site` from this folder and visit `http://localhost:8000`. Public tracking requires an existing shipment in Supabase. The local source preview uses fragment navigation. The published site serves dedicated URLs for Tracking, Milestones, Tracking Help, About, Design & Print, Quote, Contact, and Team Portal.
 
 ## Verify the live setup
 
@@ -103,4 +103,4 @@ To preview locally, run `python -m http.server 8000 --directory site` from this 
 
 The team portal keeps its session in browser memory. Reloading the page or reaching the session expiry requires signing in again.
 
-Hero photograph by [Bent Van Aeken on Unsplash](https://unsplash.com/photos/an-aerial-view-of-a-cargo-ship-in-the-ocean-0A7YwYhZhWw).
+Photography by [Bernd Dittrich](https://unsplash.com/photos/a-forklift-driving-through-a-warehouse-filled-with-pallets-F2C_mSrb6iM), [Bank Phrom](https://unsplash.com/photos/printing-machine-Tzm3Oyu_6sk), and [Bent Van Aeken on Unsplash](https://unsplash.com/photos/an-aerial-view-of-a-cargo-ship-in-the-ocean-0A7YwYhZhWw).
