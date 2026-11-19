@@ -272,6 +272,16 @@ bind($('complaint-form'), async (values) => {
   message($('complaint-message'), 'Complaint received. Save your reference: ' + complaintReference(id));
 }, $('complaint-message'));
 
+function setSigninPasswordVisible(visible) {
+  $('signin-password').type = visible ? 'text' : 'password';
+  $('signin-password-toggle').textContent = visible ? 'Hide password' : 'Show password';
+}
+
+$('signin-password-toggle').hidden = false;
+$('signin-password-toggle').addEventListener('click', () => {
+  setSigninPasswordVisible($('signin-password').type === 'password');
+});
+
 function clearSession() {
   session = null;
   isAdmin = false;
@@ -293,7 +303,9 @@ function clearSession() {
   $('create-staff-form').reset();
   message($('create-staff-message'));
   $('next-page').hidden = true;
-  $('signin-card').hidden = false;
+  $('signed-in-heading').hidden = true;
+  setSigninPasswordVisible(false);
+  message($('signin-message'));
   $('signin-layout').hidden = false;
   $('workspace').hidden = true;
   for (const item of document.querySelectorAll('[data-admin-tool]')) item.hidden = true;
@@ -309,6 +321,7 @@ function clearSession() {
 }
 
 bind($('signin-form'), async (values) => {
+  setSigninPasswordVisible(false);
   const auth = await request('/auth/v1/token?grant_type=password', {
     method: 'POST',
     body: { email: values.get('email').trim(), password: values.get('password') }
@@ -327,7 +340,7 @@ bind($('signin-form'), async (values) => {
   $('identity').hidden = false;
   $('portal-title').textContent = isAdmin ? 'Operations dashboard' : 'Shipment dashboard';
   $('metric-shipments-label').textContent = isAdmin ? 'Total shipments' : 'Assigned shipments';
-  $('signin-card').hidden = true;
+  $('signed-in-heading').hidden = false;
   $('signin-layout').hidden = true;
   $('workspace').hidden = false;
   for (const item of document.querySelectorAll('[data-admin-tool]')) item.hidden = !isAdmin;
@@ -341,8 +354,8 @@ bind($('signin-form'), async (values) => {
   $('new-shipment').hidden = !isAdmin;
   $('staff-create').hidden = !isAdmin;
   showEmptyDetail();
-  await Promise.all([loadList(), loadMetrics()]);
-}, $('portal-message'));
+  await Promise.all([loadList(), loadMetrics()]).catch(error => message($('portal-message'), error.message, true));
+}, $('signin-message'));
 
 bind($('create-staff-form'), async (values) => {
   if (!isAdmin || !session) throw new Error('Administrator access is required.');

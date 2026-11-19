@@ -276,7 +276,7 @@
     </div>
   </section>
   <section id="portal-page" class="shell portal" aria-labelledby="portal-title" hidden>
-    <div class="portal-heading">
+    <div class="portal-heading" id="signed-in-heading" hidden>
       <div><p class="eyebrow"><span></span> GLOBEFREIGHT EXPRESS</p><h1 id="portal-title">Team portal</h1><p id="identity" class="portal-identity" hidden></p></div>
       <div class="portal-actions">
         <button id="open-inbox" class="secondary portal-inbox-button" type="button" hidden>Complaints inbox</button>
@@ -286,19 +286,30 @@
     </div>
     <p id="portal-message" role="status" hidden></p>
     <div class="signin-layout" id="signin-layout">
-      <div id="signin-card" class="card signin">
-      <h2 id="signin-title">GlobeFreight Team Sign-In</h2>
-      <p class="muted signin-intro">Use your GlobeFreight staff or administrator account to sign in.</p>
-      <form id="signin-form">
-        <label>Email <input type="email" name="email" required autocomplete="username"></label>
-        <label>Password <input type="password" name="password" required autocomplete="current-password"></label>
-        <button type="submit">Sign in</button>
-      </form>
+      <div id="signin-card" class="signin">
+        <h1 id="signin-title">GlobeFreight Team Sign-In</h1>
+        <p class="muted signin-intro">Use your staff or administrator email to open your workspace.</p>
+        <p id="signin-message" role="status" hidden></p>
+        <form id="signin-form">
+          <div class="signin-field">
+            <label for="signin-email">Email</label>
+            <input id="signin-email" type="email" name="email" required autocomplete="username" autocapitalize="none" spellcheck="false">
+          </div>
+          <div class="signin-field">
+            <label for="signin-password">Password</label>
+            <div class="signin-password-field">
+              <input id="signin-password" type="password" name="password" required autocomplete="current-password">
+              <button type="button" id="signin-password-toggle" class="signin-password-toggle" aria-controls="signin-password" hidden>Show password</button>
+            </div>
+          </div>
+          <button class="signin-submit" type="submit">Sign in</button>
+        </form>
       </div>
-      <aside class="card signin-guide">
-        <h2>Team access</h2>
-        <p>Staff sign in to work on the shipments and cases assigned to them. Administrators can also manage accounts, quote requests, and access permissions.</p>
-        <p class="muted">If you need a staff account, contact your GlobeFreight administrator.</p>
+      <aside class="signin-guide" aria-labelledby="signin-guide-title">
+        <img src="assets/globe-mark.svg?v=3" width="48" height="48" alt="">
+        <h2 id="signin-guide-title">Your operations workspace</h2>
+        <p>Manage shipments, review pickup requests, and respond to customer cases from one place.</p>
+        <p class="signin-access">Need access? Ask your GlobeFreight administrator to create your team account.</p>
       </aside>
     </div>
     <div id="workspace" class="dashboard-shell" hidden>
