@@ -469,7 +469,7 @@ async function openShipment(id) {
   const version = ++detailVersion;
   selectShipment(id);
   const detail = $('shipment-detail');
-  detail.replaceChildren(el('p', 'Loading shipmentâ€¦', 'muted'));
+  detail.replaceChildren(el('p', 'Loading shipment...', 'muted'));
   try {
     const [rows, rights, events] = await Promise.all([
       staffRequest('pf_shipments?id=eq.' + id + '&select=*'),

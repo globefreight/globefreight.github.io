@@ -123,3 +123,6 @@ code{overflow-wrap:anywhere}
 .badge[data-status="In transit"],.badge[data-status="Out for delivery"]{background:#e4effa;color:#204e78}
 @media(max-width:760px){.workspace-grid{grid-template-columns:1fr}.dashboard-metrics{gap:.55rem}.metric{padding:.8rem;gap:.45rem;flex-direction:column}}
 @media(max-width:410px){.dashboard-metrics{grid-template-columns:1fr}.metric{flex-direction:row;min-height:0}}
+
+.brand-mark{object-fit:contain;background:transparent}
+.icon-box svg,.milestone-icon svg,.metric-icon svg{display:block;width:23px;height:23px}
