@@ -28,7 +28,6 @@ const dateOnly = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZ
 const pageSize = 30;
 let session = null;
 let isAdmin = false;
-let loginMode = 'staff';
 let currentShipment = null;
 let detailVersion = 0;
 let listVersion = 0;
@@ -202,17 +201,6 @@ bind($('complaint-form'), async (values) => {
   message($('complaint-message'), 'Complaint received. Save your reference: ' + complaintReference(id));
 }, $('complaint-message'));
 
-function chooseMode(mode) {
-  loginMode = mode;
-  $('signin-title').textContent = mode === 'admin' ? 'Administrator sign-in' : 'Staff sign-in';
-  $('admin-mode').setAttribute('aria-pressed', String(mode === 'admin'));
-  $('staff-mode').setAttribute('aria-pressed', String(mode === 'staff'));
-  message($('portal-message'));
-}
-
-$('admin-mode').onclick = () => chooseMode('admin');
-$('staff-mode').onclick = () => chooseMode('staff');
-
 function clearSession() {
   session = null;
   isAdmin = false;
@@ -247,14 +235,13 @@ function clearSession() {
 }
 
 bind($('signin-form'), async (values) => {
-  const selectedMode = loginMode;
   const auth = await request('/auth/v1/token?grant_type=password', {
     method: 'POST',
     body: { email: values.get('email').trim(), password: values.get('password') }
   });
   const rights = await request('/rest/v1/rpc/pf_rights', { method: 'POST', body: {}, token: auth.access_token });
-  if (rights.admin !== (selectedMode === 'admin')) {
-    throw new Error(selectedMode === 'admin' ? 'This account does not have administrator access.' : 'Use Admin login for this account.');
+  if (typeof rights?.admin !== 'boolean') {
+    throw new Error('Could not verify your team access. Please try again.');
   }
   session = { ...auth, expiresAt: Date.now() + (auth.expires_in - 10) * 1000 };
   isAdmin = rights.admin;

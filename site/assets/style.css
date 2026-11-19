@@ -60,9 +60,10 @@ footer{background:var(--deep);color:#c8d9dd}
 .portal .eyebrow span{background:var(--teal)}
 .portal h1{font-size:clamp(2.4rem,5vw,4rem)}
 .signin{max-width:510px}
+.signin-intro{margin:.55rem 0 0}
 .signin form,.fields{display:grid;gap:.95rem;margin-top:1rem}
 .signin form button{justify-self:start}
-.login-switch,.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
 .secondary{background:white;border-color:#a9c5bf;color:#065748}
 .secondary[aria-pressed=true]{background:#e1f3eb;border-color:var(--teal)}
 .workspace-grid{display:grid;grid-template-columns:minmax(245px,1fr) minmax(0,2.5fr);gap:1rem;align-items:start}
