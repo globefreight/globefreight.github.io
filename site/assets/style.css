@@ -544,3 +544,8 @@ code{overflow-wrap:anywhere}
   .signin-guide img{width:36px;height:36px;margin-bottom:.7rem}
   .signin-guide .signin-access{margin-top:.9rem;padding-top:.7rem}
 }
+.signin form .text-button{justify-self:center;margin-top:0;font-size:.9rem}
+#label-camera{display:block;width:min(100%,480px);margin:.75rem 0;border-radius:10px;background:var(--deep)}
+#mfa-settings summary{cursor:pointer;font-weight:800}
+.mfa-qr{display:block;width:min(100%,190px);height:auto;margin:.7rem 0;border:1px solid var(--line)}
+.mfa-secret{overflow-wrap:anywhere;font-family:ui-monospace,monospace}

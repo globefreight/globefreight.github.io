@@ -100,6 +100,17 @@ Country and region data from [country-region-data 4.1.0](https://github.com/coun
 
 Apply [the GF tracking migration](supabase/migrations/20261119000700_globefreight_tracking_prefix.sql) after the earlier migrations. New shipments receive GF tracking numbers, and existing PF numbers are converted to GF. Previously shared PF tracking links and printed QR codes continue to work through a private alias. The public tracking result displays the current GF number.
 
+## Enable password recovery, optional two-factor authentication, and reports
+
+1. Run [the security and reports migration](supabase/migrations/20261119000800_globefreight_security_reports.sql) after the earlier migrations. This adds administrator-only CSV reports and verifies two-factor assurance for administrators who have enabled a factor.
+2. In Supabase **Authentication → URL Configuration → Redirect URLs**, allow the published Team Portal URL, `https://globefreight.github.io/portal/`. Update it to the matching deployment path if the site is hosted elsewhere. Configure custom SMTP in **Authentication → SMTP Settings** for staff password-reset delivery. Recovery links must be opened in the same browser that requested them.
+3. Two-factor setup is optional. Administrators can open **Staff & access → My account security** to add or remove an authenticator. Keep TOTP enrollment and verification enabled in Supabase if administrators want to use the option. An administrator who enrolls an authenticator must verify it on future sign-ins. Unenrolled administrators and staff can continue with their usual passwords.
+4. Under **Shipments → Scan a shipment label**, team members can open an authorized shipment from a live camera, a QR photo, or a pasted tracking link. Live camera requires HTTPS and permission from the visitor. Scans are processed in the browser.
+5. Under **Activity & import → Shipment reports**, administrators can export CSV files filtered by creation date, service, destination, and latest status. Reports are limited to 5,000 matching rows per export. Narrow the filters if more match.
+6. The contact page displays the supplied address from `site/assets/business-details.js`. Confirm mail delivery before providing that address to customers or using it as an outbound sender or reply-to. Configure a working mailbox separately from GitHub Pages. Phone, hours, and location availability remain configurable in that file.
+
+The locally bundled QR decoder is [jsQR 1.4.0](https://github.com/cozmo/jsQR) under the Apache 2.0 license.
+
 ## Deploy staff account creation in Supabase
 
 In **Edge Functions**, choose **Deploy a new function → Via Editor**. Name it `create-staff` and replace the editor contents with [the included function](supabase/functions/create-staff/index.ts), then deploy it. In the function's **Details** tab, turn off **Verify JWT with legacy secret**. The handler verifies the Supabase Auth session itself and checks the live administrator role before creating an account. It uses Supabase's built-in server-side credentials. No Node.js or PowerShell is needed.

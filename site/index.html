@@ -27,6 +27,8 @@
   <script defer src="assets/booking.js"></script>
   <script defer src="assets/admin-access.js"></script>
   <script defer src="assets/shipment-addresses.js"></script>
+  <script defer src="assets/account-security.js"></script>
+  <script defer src="assets/shipment-tools.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -288,7 +290,7 @@
     <div class="signin-layout" id="signin-layout">
       <div id="signin-card" class="signin">
         <h1 id="signin-title">GlobeFreight Team Sign-In</h1>
-        <p class="muted signin-intro">Use your staff or administrator email to open your workspace.</p>
+        <p class="muted signin-intro" id="signin-intro">Use your staff or administrator email to open your workspace.</p>
         <p id="signin-message" role="status" hidden></p>
         <form id="signin-form">
           <div class="signin-field">
@@ -303,6 +305,24 @@
             </div>
           </div>
           <button class="signin-submit" type="submit">Sign in</button>
+          <button type="button" class="text-button" id="forgot-password">Forgot password?</button>
+        </form>
+        <form id="recover-form" hidden>
+          <div class="signin-field"><label for="recover-email">Team email</label><input id="recover-email" name="email" type="email" autocomplete="username" required></div>
+          <button class="signin-submit" type="submit">Send reset link</button>
+          <button type="button" class="text-button auth-back">Back to sign-in</button>
+        </form>
+        <form id="reset-form" hidden>
+          <div class="signin-field"><label for="new-password">New password</label><input id="new-password" name="password" type="password" minlength="12" maxlength="72" autocomplete="new-password" required></div>
+          <div class="signin-field"><label for="confirm-password">Confirm password</label><input id="confirm-password" name="confirmation" type="password" minlength="12" maxlength="72" autocomplete="new-password" required></div>
+          <button class="signin-submit" type="submit">Save new password</button>
+          <button type="button" class="text-button auth-back">Back to sign-in</button>
+        </form>
+        <form id="verify-signin-form" hidden>
+          <div class="signin-field" id="signin-factor-field" hidden><label for="signin-factor">Authenticator</label><select id="signin-factor"></select></div>
+          <div class="signin-field"><label for="signin-otp">Authenticator code</label><input id="signin-otp" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required></div>
+          <button class="signin-submit" type="submit">Verify and sign in</button>
+          <button type="button" class="text-button auth-back">Back to sign-in</button>
         </form>
       </div>
       <aside class="signin-guide" aria-labelledby="signin-guide-title">
@@ -456,6 +476,42 @@
           <button id="more-staff" type="button" class="secondary" hidden>Load more staff</button>
           <div id="staff-selected" class="detail-section" hidden></div>
         </section>
+        <section class="card team-tool" data-dashboard-area="staff" data-admin-tool id="admin-security" hidden>
+          <h2>My account security</h2>
+          <p class="muted">Two-factor authentication is optional. Once enabled for your account, you'll verify a code from your authenticator app when you sign in.</p>
+          <details id="mfa-settings"><summary>Manage two-factor authentication</summary><div id="mfa-settings-body"></div></details>
+          <p id="mfa-settings-message" role="status" hidden></p>
+        </section>
+        <section class="card team-tool" data-dashboard-area="team" data-admin-tool hidden>
+          <h2>Shipment reports</h2>
+          <p class="muted">Export shipments by creation date, service, destination, and latest status. Report dates use UTC.</p>
+          <form id="shipment-report-form" class="fields">
+            <div class="field-grid">
+              <label>From <input id="report-start" name="from" type="date" required></label>
+              <label>To <input id="report-end" name="to" type="date" required></label>
+              <label>Service <select name="service" id="report-service"></select></label>
+              <label>Status <select name="status" id="report-status"></select></label>
+              <label>Destination contains <input name="destination" maxlength="120"></label>
+            </div>
+            <div><button type="submit">Download shipment CSV</button></div>
+          </form>
+          <p id="shipment-report-message" role="status" hidden></p>
+        </section>
+        <details class="card team-tool" data-dashboard-area="shipments" id="label-scanner">
+          <summary>Scan a shipment label</summary>
+          <p class="muted">Point your camera at a GlobeFreight QR label, upload a photo of it, or enter its tracking number.</p>
+          <div class="actions">
+            <button id="start-label-camera" class="secondary" type="button">Start camera</button>
+            <button id="stop-label-camera" class="secondary" type="button" hidden>Stop camera</button>
+          </div>
+          <video id="label-camera" muted playsinline hidden></video>
+          <form id="label-scan-form" class="fields">
+            <label>Photo of QR label <input id="label-upload" type="file" accept="image/*"></label>
+            <label>Tracking number or link <input name="label" maxlength="1500" required></label>
+            <div><button type="submit" class="secondary">Open shipment</button></div>
+          </form>
+          <p id="label-scan-message" role="status" hidden></p>
+        </details>
         <div class="workspace-grid" data-dashboard-area="shipments">
           <aside class="card list-card">
             <div class="list-heading">

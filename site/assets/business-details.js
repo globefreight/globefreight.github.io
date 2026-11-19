@@ -1,6 +1,6 @@
 // Set confirmed to true only for an approved GlobeFreight service location. Add verified contact details here. Blank values stay hidden.
 window.globeFreightDetails = {
-  email: '',
+  email: 'express@globefreight.github.io',
   phone: '',
   hours: '',
   locations: [

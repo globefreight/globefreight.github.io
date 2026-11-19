@@ -305,6 +305,8 @@ function clearSession() {
   $('next-page').hidden = true;
   $('signed-in-heading').hidden = true;
   setSigninPasswordVisible(false);
+  resetAccountSecurity();
+  stopLabelCamera();
   message($('signin-message'));
   $('signin-layout').hidden = false;
   $('workspace').hidden = true;
@@ -326,7 +328,19 @@ bind($('signin-form'), async (values) => {
     method: 'POST',
     body: { email: values.get('email').trim(), password: values.get('password') }
   });
+  await completeTeamSignin(auth);
+}, $('signin-message'));
+
+async function completeTeamSignin(auth) {
   const rights = await request('/rest/v1/rpc/pf_rights', { method: 'POST', body: {}, token: auth.access_token });
+  if (rights?.mfa_required === true || (auth.user?.factors || []).some(factor => factor.status === 'verified')) {
+    await prepareSigninVerification(auth);
+    return;
+  }
+  await enterTeamWorkspace(auth, rights);
+}
+
+async function enterTeamWorkspace(auth, rights) {
   if (typeof rights?.admin !== 'boolean') {
     throw new Error('Could not verify your team access. Please try again.');
   }
@@ -355,7 +369,7 @@ bind($('signin-form'), async (values) => {
   $('staff-create').hidden = !isAdmin;
   showEmptyDetail();
   await Promise.all([loadList(), loadMetrics()]).catch(error => message($('portal-message'), error.message, true));
-}, $('signin-message'));
+}
 
 bind($('create-staff-form'), async (values) => {
   if (!isAdmin || !session) throw new Error('Administrator access is required.');
@@ -420,6 +434,7 @@ function route() {
   document.title = 'GlobeFreight Express | ' + title;
   if (delivery) message($('delivery-message'));
   if (privateView || (routed && !['main','page-top'].includes(fragment))) window.scrollTo(0, 0);
+  if (!portal && typeof stopLabelCamera === 'function') stopLabelCamera();
   if (!portal && !$('complaint-inbox').hidden) {
     showDashboardView('overview');
   }
@@ -810,7 +825,7 @@ function applyBusinessDetails() {
     const line = el('p', label + ': ');
     if (scheme) {
       const link = el('a', value);
-      link.href = scheme + (scheme === 'tel:' ? value.replace(/[^+\d]/g, '') : encodeURIComponent(value));
+      link.href = scheme + (scheme === 'tel:' ? value.replace(/[^+\d]/g, '') : encodeURIComponent(value).replaceAll('%40','@'));
       line.append(link);
     } else {
       line.append(value);
@@ -1025,6 +1040,7 @@ function highlightDashboard(view) {
 
 function showDashboardView(view) {
   if (['team','quotes','staff','customers'].includes(view) && !isAdmin) return;
+  if (view !== 'shipments') stopLabelCamera();
   if (view === 'complaints') {
     if ($('complaint-inbox').hidden) $('open-inbox').click();
     return;
