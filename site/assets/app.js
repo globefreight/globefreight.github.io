@@ -34,6 +34,7 @@ let listVersion = 0;
 let metricsVersion = 0;
 let inboxVersion = 0;
 let complaintOffset = 0;
+let complaintFilter = '';
 let shipmentQuery = '';
 let pageOffset = 0;
 let trackingVersion = 0;
@@ -230,6 +231,7 @@ function clearSession() {
   clearAdminOperations();
   resetTeamTools();
   resetPickupQueue();
+  resetStaffDirectory();
   closeComplaintInbox();
   $('logout').hidden = true;
 }
@@ -243,6 +245,7 @@ bind($('signin-form'), async (values) => {
   if (typeof rights?.admin !== 'boolean') {
     throw new Error('Could not verify your team access. Please try again.');
   }
+  if (rights.suspended === true) throw new Error('Your GlobeFreight team access is suspended. Contact your administrator.');
   session = { ...auth, expiresAt: Date.now() + (auth.expires_in - 10) * 1000 };
   isAdmin = rights.admin;
   $('signin-form').reset();
@@ -282,6 +285,9 @@ bind($('create-staff-form'), async (values) => {
   if (session !== activeSession) return;
   $('create-staff-form').reset();
   message($('create-staff-message'), 'Staff login created for ' + email + '. You can now grant shipment access.');
+  if ($('shipment-workspace').dataset.dashboardView === 'staff') {
+    loadStaffDirectory().catch(error => message($('staff-directory-message'), error.message, true));
+  }
 }, $('create-staff-message'));
 
 $('logout').onclick = async () => {
@@ -620,6 +626,8 @@ function complaintReference(id) {
 function closeComplaintInbox() {
   inboxVersion++;
   complaintOffset = 0;
+  complaintFilter = '';
+  $('case-lookup').reset();
   $('complaint-inbox').hidden = true;
   $('shipment-workspace').hidden = false;
   $('new-shipment').hidden = !isAdmin;
@@ -679,11 +687,15 @@ async function loadComplaintInbox(append = false, reopenId = null) {
   const version = ++inboxVersion;
   const offset = append ? complaintOffset : 0;
   const limit = complaintsPerPage + 1;
-  const rows = await staffRequest('gf_complaints?select=*&order=received_at.desc,id.desc&offset=' + offset + '&limit=' + limit);
+  const filter = complaintFilter ? '&id=eq.' + complaintFilter : '';
+  const rows = await staffRequest('gf_complaints?select=*&order=received_at.desc,id.desc&offset=' + offset + '&limit=' + limit + filter);
   if (version !== inboxVersion || $('complaint-inbox').hidden) return;
   const list = $('complaint-list');
   if (!append) list.replaceChildren();
-  if (!rows.length && !offset) list.append(el('p', isAdmin ? 'No complaints received yet.' : 'No complaints are assigned to you.', 'muted'));
+  if (!rows.length && !offset) {
+    list.append(el('p', complaintFilter ? 'No accessible complaint matches that reference.' :
+      isAdmin ? 'No complaints received yet.' : 'No complaints are assigned to you.', 'muted'));
+  }
   for (const record of rows.slice(0, complaintsPerPage)) {
     const card = complaintRecord(record);
     card.open = reopenId === record.id;
@@ -707,6 +719,15 @@ $('close-inbox').onclick = () => {
   showDashboardView('shipments');
   document.querySelector('[data-dashboard-tab="shipments"]')?.focus();
 };
+
+bind($('case-lookup'), async (values) => {
+  const ref = values.get('reference').trim().replace(/^GF-/i, '').toLowerCase();
+  if (ref && !/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(ref)) {
+    throw new Error('Enter the complaint reference beginning with GF-.');
+  }
+  complaintFilter = ref;
+  await loadComplaintInbox(false, ref);
+}, $('inbox-message'));
 
 $('refresh-inbox').onclick = (event) => run(event.currentTarget, () => loadComplaintInbox(), $('inbox-message'));
 $('more-complaints').onclick = (event) => run(event.currentTarget, () => loadComplaintInbox(true), $('inbox-message'));
@@ -939,7 +960,7 @@ function highlightDashboard(view) {
 }
 
 function showDashboardView(view) {
-  if ((view === 'team' || view === 'quotes') && !isAdmin) return;
+  if (['team','quotes','staff','customers'].includes(view) && !isAdmin) return;
   if (view === 'complaints') {
     if ($('complaint-inbox').hidden) $('open-inbox').click();
     return;
@@ -950,6 +971,9 @@ function showDashboardView(view) {
   highlightDashboard(view);
   const panel = { pickups:'pickup-queue', exceptions:'exception-queue', quotes:'quote-queue' }[view];
   if (panel) $(panel).open = true;
+  if (view === 'staff') {
+    loadStaffDirectory().catch(error => message($('staff-directory-message'), error.message, true));
+  }
 }
 
 for (const button of document.querySelectorAll('[data-dashboard-tab],[data-dashboard-open]')) {

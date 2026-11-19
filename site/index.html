@@ -24,6 +24,7 @@
   <script defer src="assets/app.js"></script>
   <script defer src="assets/team-tools.js"></script>
   <script defer src="assets/booking.js"></script>
+  <script defer src="assets/admin-access.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -272,7 +273,9 @@
         <button type="button" class="secondary" data-dashboard-tab="exceptions">Delivery exceptions</button>
         <button type="button" class="secondary" data-dashboard-tab="complaints">Complaints inbox</button>
         <button type="button" class="secondary" data-dashboard-tab="quotes" data-admin-tool hidden>Quote requests</button>
-        <button type="button" class="secondary" data-dashboard-tab="team" data-admin-tool hidden>Team &amp; activity</button>
+        <button type="button" class="secondary" data-dashboard-tab="staff" data-admin-tool hidden>Staff &amp; access</button>
+        <button type="button" class="secondary" data-dashboard-tab="customers" data-admin-tool hidden>Customer service</button>
+        <button type="button" class="secondary" data-dashboard-tab="team" data-admin-tool hidden>Activity &amp; import</button>
       </nav>
       <div class="dashboard-main">
       <section class="card inbox-panel" id="complaint-inbox" aria-labelledby="inbox-title" hidden>
@@ -284,6 +287,11 @@
           </div>
         </div>
         <p id="inbox-message" role="status" hidden></p>
+        <form id="case-lookup" class="fields">
+          <label for="case-reference">Find a complaint by reference</label>
+          <div class="input-row"><input id="case-reference" name="reference" maxlength="39" placeholder="GF-..." autocomplete="off">
+          <button type="submit" class="secondary">Find complaint</button></div>
+        </form>
         <div id="complaint-list"></div>
         <button id="more-complaints" class="secondary" type="button" hidden>Load more complaints</button>
       </section>
@@ -353,9 +361,25 @@
             <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="pickups"><strong>Review pickups</strong><span>Open proposed pickup windows and record a decision.</span></button>
             <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="exceptions"><strong>Follow up on exceptions</strong><span>Review delays, stalled shipments, and assigned issues.</span></button>
             <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="complaints"><strong>Handle complaints</strong><span>Review cases and send replies or status links.</span></button>
+            <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="staff" data-admin-tool hidden><strong>Manage staff access</strong><span>Create accounts, assign work, and revoke access.</span></button>
+            <button type="button" class="secondary dashboard-shortcut" data-dashboard-open="customers" data-admin-tool hidden><strong>Help a customer</strong><span>Find a shipment or complaint and open its support tools.</span></button>
           </div>
         </section>
-        <details class="card staff-create" id="staff-create" data-dashboard-area="team" hidden>
+        <section class="card team-tool" data-dashboard-area="customers" data-admin-tool hidden aria-labelledby="customer-service-title">
+          <h2 id="customer-service-title">Customer service</h2>
+          <p class="muted">Find a shipment to manage the recipient email, private service link, pickup requests, or delivery documents.</p>
+          <form id="customer-shipment-lookup" class="fields">
+            <label for="customer-tracking">Customer tracking number</label>
+            <div class="input-row"><input id="customer-tracking" name="tracking" maxlength="50" required autocomplete="off">
+            <button type="submit" class="secondary">Open shipment</button></div>
+          </form>
+          <p id="customer-tools-message" role="status" hidden></p>
+          <div class="actions">
+            <button type="button" class="secondary" data-dashboard-open="complaints">Find a complaint or reply</button>
+            <button type="button" class="secondary" data-dashboard-open="quotes">Review customer quotes</button>
+          </div>
+        </section>
+        <details class="card staff-create" id="staff-create" data-dashboard-area="staff" hidden>
           <summary>Create staff login</summary>
           <p class="muted">Create a login here, then assign the account to shipments under Staff access.</p>
           <form id="create-staff-form" class="fields">
@@ -367,6 +391,19 @@
           </form>
           <p id="create-staff-message" role="status" hidden></p>
         </details>
+        <section id="staff-admin-panel" class="card team-tool" data-dashboard-area="staff" data-admin-tool hidden aria-labelledby="staff-admin-title">
+          <h2 id="staff-admin-title">Staff directory and assignments</h2>
+          <p class="muted">Manage confirmed staff accounts. Suspension removes shipment access and returns complaints and exceptions to the admin queue. Reinstated staff can sign in again and receive new assignments.</p>
+          <form id="staff-directory-search" class="fields">
+            <label for="staff-directory-query">Search staff by email</label>
+            <div class="input-row"><input id="staff-directory-query" name="query" maxlength="254" autocomplete="off">
+            <button type="submit" class="secondary">Find staff</button></div>
+          </form>
+          <p id="staff-directory-message" role="status" hidden></p>
+          <div id="staff-directory-list" class="staff-directory-list"></div>
+          <button id="more-staff" type="button" class="secondary" hidden>Load more staff</button>
+          <div id="staff-selected" class="detail-section" hidden></div>
+        </section>
         <div class="workspace-grid" data-dashboard-area="shipments">
           <aside class="card list-card">
             <div class="list-heading">

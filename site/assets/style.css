@@ -306,3 +306,15 @@ code{overflow-wrap:anywhere}
 .tracking-guide p,.signin-guide p{color:var(--muted);margin:.65rem 0 0}
 .signin-layout .signin{max-width:none}
 @media(max-width:760px){.track-layout,.signin-layout{grid-template-columns:1fr}}
+#shipment-workspace[data-dashboard-view=staff] [data-dashboard-area]:not([data-dashboard-area=staff]),
+#shipment-workspace[data-dashboard-view=customers] [data-dashboard-area]:not([data-dashboard-area=customers]){display:none!important}
+.staff-directory-list{display:grid;gap:.45rem;margin-block:1rem}
+.staff-directory-list button{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem .8rem;width:100%;text-align:left;overflow-wrap:anywhere}
+.staff-directory-list button[aria-current=true]{background:#dcf2e6;border-color:#8dbca2}
+.staff-assignments{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-block:1.1rem}
+.staff-assignments section{border:1px solid var(--line);border-radius:10px;padding:1rem;min-width:0;overflow-wrap:anywhere}
+.staff-assignments h4{margin:.1rem 0 .6rem}
+.staff-assignment-actions{display:flex;flex-wrap:wrap;gap:.45rem}
+#case-lookup{margin-bottom:1rem}
+@media(max-width:850px){.staff-assignments{grid-template-columns:1fr}}
+.badge[data-status="Suspended"]{background:#fcebe6;color:#8a3025}

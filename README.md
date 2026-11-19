@@ -13,8 +13,8 @@ A shipment-tracking website with a public timeline, separate staff and administr
    on conflict do nothing;
    ```
 
-3. Deploy the staff account function below. In the website, open **Team Portal → GlobeFreight Team Sign-In → Team & activity → Create staff login** to add an email/password account. Provide the initial password to the intended staff member privately. Create a shipment and assign staff by email. Each assignment allows viewing that shipment. Check the options for editing its details or posting tracking events as needed. To change or remove a grant, open the shipment's **Staff access** section.
-4. To disable a staff account across all shipments, use Supabase Auth account controls and remove its shipment grants. For a permanent offboarding, deleting the Auth user removes all corresponding grants automatically. The migration keeps shipment events if their author account is removed.
+3. Deploy the staff account function below. In the website, open **Team Portal → GlobeFreight Team Sign-In → Staff & access → Create staff login** to add an email/password account. Provide the initial password to the intended staff member privately. Create a shipment and assign staff by email. Each assignment allows viewing that shipment. Check the options for editing its details or posting tracking events as needed. To change or remove a grant, open the shipment's **Staff access** section.
+4. Apply the staff access migration below to manage account suspension and assignments from the dashboard. A permanent deletion of the Auth user is a separate action in Supabase and is not required to suspend access.
 5. Use city or facility names in public location fields and keep customer names, addresses, and contact details out of public fields. A tracking link shares the route, ETA, and published timeline with anyone holding the link. Internal references appear only in the authorized workspace. Keep the private schema out of the Data API exposed schema list. Restrict public Auth signups if your project is dedicated to this team.
 
 ## Enable the customer complaints inbox
@@ -79,6 +79,13 @@ Test with addresses you control before opening the form to customers. The queue 
 3. For other shipments, saving a recipient email also queues a private shipment link. For an existing recipient, open **Pickup and delivery instructions → Email a new private shipment link**. New links replace prior links and expire after 30 days.
 4. Customers use their link to propose a pickup window and share delivery directions or an alternate contact. Open **Pickup requests** to review incoming requests. Administrators and staff with edit or tracking-update permission can confirm, cancel, or request a new window. Confirmed pickup times appear on tracking. Delivery instructions remain available to the intended recipient through their private link and to staff with access to the shipment.
 5. In **Edge Functions → Secrets**, set `GF_DIGEST_EMAIL` to the confirmed Supabase Auth email of an administrator. The existing scheduled email job queues one summary per day after **8:00 a.m. Africa/Lagos**. Override this using `GF_DIGEST_TIMEZONE` (IANA time zone) and `GF_DIGEST_HOUR` (0–23). The summary contains counts of overdue shipments, unresolved complaints, quotes awaiting team action, and pickup requests.
+
+## Enable the Staff & Access dashboard
+
+1. Apply [the staff access migration](supabase/migrations/20261119000500_globefreight_staff_access.sql) after the first five migrations. If the Delivery Exceptions migration was skipped on an existing project, install the missing team-tools schema before applying this migration.
+2. Sign in with the Supabase account registered in the administrators table. It should open the **Operations dashboard**. Open **Staff & access** to create an account or select an existing confirmed staff account. Assign shipments by tracking number and complaints by case reference. You can change shipment permissions or remove individual assignments here.
+3. **Suspend staff access** blocks that account from the GlobeFreight dashboard, removes shipment permissions, and returns its complaints and delivery exceptions to the admin queue. **Reinstate staff access** allows the user to sign in and receive fresh assignments.
+4. **Customer service** gives administrators a shipment lookup and links to complaints and quotes. Use the shipment record to manage recipient email, private shipment links, pickup, and delivery documents. Use **Find a complaint** in the inbox to open an older case by its GF reference.
 
 ## Deploy staff account creation in Supabase
 
