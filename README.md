@@ -13,9 +13,15 @@ A shipment-tracking website with a public timeline, separate staff and administr
    on conflict do nothing;
    ```
 
-3. Use **Authentication → Users** to add and confirm staff email/password accounts. In the website, open **Team portal → Admin login**, create a shipment, and assign staff by email. Each assignment allows viewing that shipment. Check the options for editing its details or posting tracking events as needed. To change or remove a grant, open the shipment's **Staff access** section.
+3. Deploy the staff account function below. In the website, open **Team portal → Admin login → Create staff login** to add an email/password account. Provide the initial password to the intended staff member privately. Create a shipment and assign staff by email. Each assignment allows viewing that shipment. Check the options for editing its details or posting tracking events as needed. To change or remove a grant, open the shipment's **Staff access** section.
 4. To disable a staff account across all shipments, use Supabase Auth account controls and remove its shipment grants. For a permanent offboarding, deleting the Auth user removes all corresponding grants automatically. The migration keeps shipment events if their author account is removed.
 5. Use city or facility names in public location fields and keep customer names, addresses, and contact details out of public fields. A tracking link shares the route, ETA, and published timeline with anyone holding the link. Internal references appear only in the authorized workspace. Keep the private schema out of the Data API exposed schema list. Restrict public Auth signups if your project is dedicated to this team.
+
+## Deploy staff account creation in Supabase
+
+In **Edge Functions**, choose **Deploy a new function → Via Editor**. Name it `create-staff` and replace the editor contents with [the included function](supabase/functions/create-staff/index.ts), then deploy it. In the function's **Details** tab, turn off **Verify JWT with legacy secret**. The handler verifies the Supabase Auth session itself and checks the live administrator role before creating an account. It uses Supabase's built-in server-side credentials. No Node.js or PowerShell is needed.
+
+Sign in as administrator and open **Create staff login**. Enter the staff email and an initial password of at least 12 characters. The staff member can sign in immediately via **Staff login**. They receive shipment access only after an administrator assigns them to a shipment. The form does not email credentials.
 
 ## Deploy to GitHub Pages
 

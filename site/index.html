@@ -68,6 +68,18 @@
       </form>
     </div>
     <div id="workspace" hidden>
+      <details class="card staff-create" id="staff-create" hidden>
+        <summary>Create staff login</summary>
+        <p class="muted">Create a login here, then assign the account to shipments under Staff access.</p>
+        <form id="create-staff-form" class="fields">
+          <div class="field-grid">
+            <label>Staff email <input name="email" type="email" required maxlength="254" autocomplete="off"></label>
+            <label>Initial password <input name="password" type="password" required minlength="12" maxlength="72" autocomplete="new-password"></label>
+          </div>
+          <div><button type="submit">Create staff account</button></div>
+        </form>
+        <p id="create-staff-message" role="status" hidden></p>
+      </details>
       <div class="workspace-grid">
         <aside class="card list-card">
           <h2>Shipments</h2>

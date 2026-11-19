@@ -32,6 +32,9 @@ async function request(path, { method = 'GET', body, token, prefer } = {}) {
   }
   const data = await response.json().catch(() => null);
   if (!response.ok) {
+    if (response.status === 404 && path === '/functions/v1/create-staff') {
+      throw new Error('Deploy the create-staff Edge Function in Supabase to enable account creation.');
+    }
     if (data?.code === 'PGRST202' || data?.code === 'PGRST205') {
       throw new Error('The PrimeFreight database setup is incomplete.');
     }
@@ -185,6 +188,10 @@ function clearSession() {
   $('shipment-list').replaceChildren();
   $('shipment-detail').replaceChildren();
   $('identity').textContent = '';
+  $('staff-create').hidden = true;
+  $('staff-create').open = false;
+  $('create-staff-form').reset();
+  message($('create-staff-message'));
   $('next-page').hidden = true;
   $('signin-card').hidden = false;
   $('workspace').hidden = true;
@@ -209,9 +216,29 @@ bind($('signin-form'), async (values) => {
   $('workspace').hidden = false;
   $('logout').hidden = false;
   $('new-shipment').hidden = !isAdmin;
+  $('staff-create').hidden = !isAdmin;
   $('shipment-detail').replaceChildren(el('p', 'Select a shipment to view its details.', 'muted'));
   await loadList();
 }, $('portal-message'));
+
+bind($('create-staff-form'), async (values) => {
+  if (!isAdmin || !session) throw new Error('Administrator access is required.');
+  if (Date.now() >= session.expiresAt) {
+    clearSession();
+    message($('portal-message'), 'Your session expired. Sign in again.', true);
+    return;
+  }
+  const activeSession = session;
+  const email = values.get('email').trim().toLowerCase();
+  const password = values.get('password');
+  if (new TextEncoder().encode(password).length > 72) throw new Error('Use a password of at most 72 UTF-8 bytes.');
+  await request('/functions/v1/create-staff', {
+    method: 'POST', body: { email, password }, token: activeSession.access_token
+  });
+  if (session !== activeSession) return;
+  $('create-staff-form').reset();
+  message($('create-staff-message'), 'Staff login created for ' + email + '. You can now grant shipment access.');
+}, $('create-staff-message'));
 
 $('logout').onclick = async () => {
   const token = session?.access_token;

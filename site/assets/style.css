@@ -83,3 +83,7 @@ footer{background:var(--deep);color:#c8d9dd}
 code{overflow-wrap:anywhere}
 @media(max-width:720px){.workspace-grid,.milestones{grid-template-columns:1fr}.milestones{gap:0}.hero-inner{padding-top:4rem}.hero{min-height:420px}.footer-inner>span{display:none}}
 @media(max-width:480px){.shell{width:calc(100% - 1.6rem)}nav{gap:.45rem;font-size:.875rem}nav a:first-child{display:none}.input-row,.field-grid{display:grid;grid-template-columns:1fr}.tracking-heading{align-items:flex-start}.hero h1{font-size:2.6rem}}
+
+.staff-create{margin-bottom:1rem}
+.staff-create summary{cursor:pointer;font-weight:800;font-size:1.125rem}
+.staff-create .status-message{margin-bottom:0}
