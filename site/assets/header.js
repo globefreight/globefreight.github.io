@@ -5,6 +5,17 @@
   const header = document.getElementById('page-top');
   const mobile = window.matchMedia('(max-width: 1015px)');
 
+  const motion = document.getElementById('header-motion-toggle');
+  const announcement = motion.closest('.header-message');
+  motion.hidden = false;
+  announcement.dataset.motion = 'playing';
+  motion.addEventListener('click', () => {
+    const paused = announcement.dataset.motion === 'playing';
+    announcement.dataset.motion = paused ? 'paused' : 'playing';
+    motion.textContent = paused ? 'Resume' : 'Pause';
+    motion.setAttribute('aria-label', paused ? 'Resume header message' : 'Pause header message');
+  });
+
   function setMenu(open, returnFocus = false) {
     toggle.setAttribute('aria-expanded', String(open));
     label.textContent = open ? 'Close' : 'Menu';

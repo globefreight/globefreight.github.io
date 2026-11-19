@@ -219,14 +219,27 @@ code{overflow-wrap:anywhere}
 .hero-secondary{display:inline-block;padding:.75rem 1rem;border:1px solid #91aaa7;border-radius:8px;color:white;font-weight:800;background:#142e43}
 .hero-secondary:hover{text-decoration:underline}
 .header-message{border-bottom:1px solid #263f53;background:linear-gradient(100deg,#091625,#142f41,#091625);color:#cbe5e5;text-align:center}
-.header-message p{margin-block:0;padding-block:.4rem;font-size:.84rem;font-weight:700;letter-spacing:.025em}
+.header-message-inner{display:flex;align-items:center;gap:.55rem}
+.header-message-track{flex:1;min-width:0;margin:0;padding-block:.4rem;font-size:.84rem;font-weight:700;letter-spacing:.025em}
 .header-message span{display:inline-block}
+.header-motion-toggle{flex:none;min-width:4.5rem;align-self:center;background:transparent;border:1px solid #577887;border-radius:5px;padding:.24rem .4rem;color:#deefef;font-size:.76rem}
+.header-motion-toggle:hover{background:#213e51;filter:none}
 @media(prefers-reduced-motion:no-preference){
-  .header-message span{animation:header-message-in .58s ease-out both}
+  .header-message[data-motion=playing] .header-message-track{display:flex;justify-content:center;overflow:hidden}
+  .header-message[data-motion=playing] .header-message-track span{flex:none;white-space:nowrap;animation:header-message-slide 18s ease-in-out infinite}
+  @media(max-width:1080px){
+    .header-message[data-motion=playing] .header-message-track span{animation-name:header-message-scroll;animation-timing-function:linear}
+  }
 }
-@keyframes header-message-in{
-  from{opacity:0;transform:translateY(.28rem)}
-  to{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){.header-motion-toggle{display:none}}
+@keyframes header-message-slide{
+  0%{transform:translateX(calc(50vw + 50%))}
+  25%,72%{transform:translateX(0)}
+  100%{transform:translateX(calc(-50vw - 50%))}
+}
+@keyframes header-message-scroll{
+  from{transform:translateX(calc(50vw + 50%))}
+  to{transform:translateX(calc(-50vw - 50%))}
 }
 .header .brand{white-space:nowrap}
 .main-nav{gap:clamp(.55rem,1.4vw,1.4rem)}
@@ -398,7 +411,7 @@ code{overflow-wrap:anywhere}
 }
 @media(max-width:620px){
   html{scroll-padding-top:6.2rem}
-  .header-message p{padding-block:.29rem;font-size:.75rem}
+  .header-message-track{padding-block:.32rem;font-size:.75rem}
   input:not([type=checkbox]),select,textarea{font-size:1rem}
   .shipment-search .input-row{display:grid;grid-template-columns:minmax(0,1fr) auto}
 }
